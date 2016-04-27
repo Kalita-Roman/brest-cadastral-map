@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/Kalita-Roman/duty-map/issues"
   },
-  "homepage": "https://github.com/Kalita-Roman/duty-map#readme"
+  "homepage": "https://github.com/Kalita-Roman/duty-map#readme",
+  "dependencies": {
+    "webpack": "^1.13.0"
+  }
 }
