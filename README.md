@@ -1,1 +1,1 @@
-# duty-map
+# brest-cadastral-map
