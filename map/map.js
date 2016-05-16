@@ -15,10 +15,46 @@ L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 let featureGroup = L.featureGroup().addTo(map);
 
-let drawControl = new L.Control.Draw({
-    edit: {
+
+let data = {
+    "type":"Feature",
+    "properties":{},
+    "geometry":{
+        "type": "Polygon",
+        "coordinates":[
+            [
+                [52.119,23.690],
+                [52.112,23.723],
+                [52.104,23.695],
+                [52.119,23.690]
+            ]
+        ]
+    }
+ }
+
+ var options = {
+      color: '#fff',      // Stroke color
+      opacity: 1,         // Stroke opacity
+      weight: 10,         // Stroke weight
+      fillColor: '#000',  // Fill color
+      fillOpacity: 0.6    // Fill opacity
+  };
+
+
+//let g = L.geoJson(data);
+let g = L.polygon(data.geometry.coordinates, options[0]);
+g.bindPopup('popup');
+featureGroup.addLayer(g);
+console.log(g);
+
+
+
+let edit = {
       featureGroup: featureGroup
-    },
+    };
+
+let drawControl = new L.Control.Draw({
+    edit: edit,
     draw: {
     	polygon: true,
     	polyline: false,
@@ -28,6 +64,35 @@ let drawControl = new L.Control.Draw({
   	}
 }).addTo(map);
 
-map.on('draw:created', function(e) {
+
+let setLayer = function(e, result) {
+    if(!result) return;
+    e.layer.bindPopup(result.data.name);
+    console.log(e.layer);
     featureGroup.addLayer(e.layer);
+}
+
+let InterfaceMap = {
+
+    _listener : () => {},
+
+    setListener : function (listener) {
+        this._listener = listener;
+    },
+    
+    input : function (e, cb) {
+        this._listener(e, cb);
+    },
+
+    setInMap : function (e, result) {
+        setLayer(e, result);
+    }
+}
+
+map.on('draw:created', function(inputedShape) {
+    featureGroup.addLayer(inputedShape.layer);
+    //InterfaceMap.input(inputedShape, setLayer);
 });
+
+
+module.exports.InterfaceMap = InterfaceMap;

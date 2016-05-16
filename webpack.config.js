@@ -25,10 +25,6 @@ module.exports = {
                     presets: ['es2015', 'react'] 
                 }
             },
-            /*{
-                test: /\.jsx$/,
-                loader: 'jsx-loader?insertPragma=React.DOM&harmony'
-            },*/
             {
                 test: /\.css$/,
                 loader: ExtractTextPlugin.extract('style-loader', 'css-loader')

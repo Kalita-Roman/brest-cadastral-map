@@ -27,8 +27,11 @@
   "homepage": "https://github.com/Kalita-Roman/duty-map#readme",
   "dependencies": {
     "babel-plugin-syntax-jsx": "^6.5.0",
+    "body-parser": "^1.15.1",
     "express": "^4.13.4",
     "leaflet-draw": "^0.3.0",
+    "multer": "^1.1.0",
+    "pg-promise": "^4.1.6",
     "react": "^15.0.1",
     "react-dom": "^15.0.1",
     "webpack": "^1.13.0"
