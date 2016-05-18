@@ -15,7 +15,7 @@ L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 let featureGroup = L.featureGroup().addTo(map);
 
-
+/*
 let data = {
     "type":"Feature",
     "properties":{},
@@ -23,10 +23,10 @@ let data = {
         "type": "Polygon",
         "coordinates":[
             [
-                [52.119,23.690],
-                [52.112,23.723],
-                [52.104,23.695],
-                [52.119,23.690]
+                [23.690,52.119],
+                [23.723,52.112],
+                [23.695,52.104],
+                [23.690,52.119]
             ]
         ]
     }
@@ -39,13 +39,15 @@ let data = {
       fillColor: '#000',  // Fill color
       fillOpacity: 0.6    // Fill opacity
   };
-
-
+*/
+/*
 //let g = L.geoJson(data);
 let g = L.polygon(data.geometry.coordinates, options[0]);
 g.bindPopup('popup');
 featureGroup.addLayer(g);
 console.log(g);
+
+*/
 
 
 
@@ -63,25 +65,74 @@ let drawControl = new L.Control.Draw({
     	marker: false
   	}
 }).addTo(map);
+/*
+function style(feature) {
+    return {
+        fillColor: '#faa',
+        weight: 2,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: 0.7
+    };
+};
+
+var newL2 = L.geoJson(data, {style: style});//.addTo(map);
+console.log(newL2);
+let newL = L.polygon(data.geometry.coordinates[0].map(x => [x[1], x[0]]), {
+        fillColor: '#faa',
+        weight: 2,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: 0.7
+    });
+featureGroup.addLayer(newL);
+console.log(newL);
+*/
+var options_layer = {
+      color: '#aaf',      // Stroke color
+      weight: null,         // Stroke weight
+      fillOpacity: 0.7    // Fill opacity
+  };
 
 
-let setLayer = function(e, result) {
+let setLayer = function(layer, result) {
     if(!result) return;
-    e.layer.bindPopup(result.data.name);
-    console.log(e.layer);
-    featureGroup.addLayer(e.layer);
+    layer.bindPopup(result.data.name);
+    layer.setStyle(options_layer);
+    featureGroup.addLayer(layer);
 }
 
 let InterfaceMap = {
 
-    _listener : () => {},
+    _listeners: {},
 
-    setListener : function (listener) {
-        this._listener = listener;
+    _listener : () => {},
+    _listenerUpdate : () => {},
+
+    setListener : function(name, listener) {
+        this._listeners[name] = listener;
     },
-    
-    input : function (e, cb) {
-        this._listener(e, cb);
+
+    getListener : function (name) {
+        return this._listeners[name];
+    },
+
+    setFromDB : function(geoJson, id, options, data) {
+        function style(feature) {
+            return options_layer;
+        };
+
+        let newLayer = L.polygon(JSON.parse(geoJson).geometry.coordinates[0].map(x => [x[1], x[0]]), options_layer );
+        newLayer.idObj = id;
+        featureGroup.addLayer(newLayer);
+        //var newLayer = L.geoJson(data, {style: style}).addTo(map);
+        //newLayer.setStyle(options_layer);
+        //var newLayer = L.geoJson(data, {style: style}).addTo(map);
+        //featureGroup.addLayer(newLayer);
+
+        //console.log(newLayer);
     },
 
     setInMap : function (e, result) {
@@ -90,9 +141,21 @@ let InterfaceMap = {
 }
 
 map.on('draw:created', function(inputedShape) {
-    featureGroup.addLayer(inputedShape.layer);
-    //InterfaceMap.input(inputedShape, setLayer);
+    InterfaceMap.getListener('input')(inputedShape.layer, setLayer);
 });
 
+map.on('draw:edited', function(e) {
+    InterfaceMap.getListener('update')(takeLayers(e));
+});
+
+map.on('draw:deleted', function(e) {
+    InterfaceMap.getListener('delete')(takeLayers(e));
+});
+
+function takeLayers(e) {
+    let layers = [];
+    e.layers.eachLayer(x => layers.push(x));
+    return layers;
+}
 
 module.exports.InterfaceMap = InterfaceMap;

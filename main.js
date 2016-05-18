@@ -1,57 +1,72 @@
-//import React from 'react';
-//import ReactDOM from 'react-dom';
-
-import MapCity from './map/map.js';
+import { InterfaceMap } from './map/map.js';
 import ModalForm from './modalform/modalform.js';
 
+let requestToDB = function(jsonbody, onreadystatechange) {
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST', '/db', true);
+	xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+	if(onreadystatechange)
+		xhr.onreadystatechange = onreadystatechange(xhr);
+	xhr.send(JSON.stringify(jsonbody));
+}
 
-/*
-var xhr = new XMLHttpRequest();
-xhr.open('POST', location.href+'db', true);
-xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-xhr.send(jsonbody);
+requestToDB(
+	{ action: 'select' },
+	function(xhr) {
+		return x =>  { 
+			if (xhr.readyState != 4) return;
+  			let response = JSON.parse(xhr.response);
+  			response.map(x => InterfaceMap.setFromDB(x.geom, x.id));
+  		}
+	}
+);
 
-*/
 let controller = {
 	inputedShape: null,
 
 	addObj(x) { 
-		MapCity.InterfaceMap.setInMap(this.inputedShape, x);
+		InterfaceMap.setInMap(this.inputedShape, x);
 
-		let layer = this.inputedShape.layer;
-	//	var body = { value: 1, text: "text2" };
-		//console.log(layer);
-		var jsonbody = layer.toGeoJSON();
-		jsonbody = JSON.stringify(jsonbody);
-		console.log(jsonbody);
+		let jsonbody = {
+			action: 'insert',
+			body: this.inputedShape.toGeoJSON()
+		}
 
-		var xhr = new XMLHttpRequest();
-		xhr.open('POST', location.href+'db', true);
-		xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-		xhr.send(jsonbody);
-
+		requestToDB(jsonbody);
 	},
 
-	listenMap(inputedShape, insertInMap) {
+	listenMapInsert(inputedShape, insertInMap) {
 		this.inputedShape = inputedShape;
 		ModalForm.show(this.addObj.bind(this));
 	},
 
+	listenMapUpdate(layers) {
+		let convert = x => { return {
+			id: x.idObj,
+			geom: x.toGeoJSON()
+		} }
 
+		let jsonbody = {
+			action: 'update',
+			body: layers.map(convert)
+		}
+
+		requestToDB(jsonbody);
+	},
+
+	listenMapDelete(layers) {
+		let convert = x => { return {
+			id: x.idObj,
+		} }
+
+		let jsonbody = {
+			action: 'delete',
+			body: layers.map(convert)
+		}
+		requestToDB(jsonbody);
+	}
 }
 
-MapCity.InterfaceMap.setListener(controller.listenMap.bind(controller));
-
-
-//var Header = require('./views/header.js');
-//var Middle = require('./views/middle.js');
-//var Footer = require('./views/footer.js');
-/*
-ReactDOM.render(
-	<div className='main-wrapper-box'>
-		<Header />
-		<Middle />
-		<Footer />
-	</div>,
- 	document.getElementById('site')
-);*/
+InterfaceMap.setListener('input', controller.listenMapInsert.bind(controller));
+InterfaceMap.setListener('update',controller.listenMapUpdate.bind(controller));
+InterfaceMap.setListener('delete',controller.listenMapDelete.bind(controller));

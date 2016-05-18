@@ -11,51 +11,53 @@ var connection = {
 var db = pgp(connection);
 
 
-module.exports.database = function(req, res) {
-	console.log(req.body);
-	db.query("INSERT INTO layer_1(name) VALUES(${body})", req)
-    	.then(function (data) {
-        	console.log("success");
-	    })
-	    .catch(function (error) {
-	        console.log(error);
-	    })
+var delupt = function(req, res, query) {
+        var body = req.body.body;
+        body.forEach( x => {
+                db.query(query, x)
+                    .then(data => {})
+                    .catch(error => {});
+            });
+        res.send('Done!');
+}
 
-	res.send('OK');
+var handler = {
+    select: function(req, res) {
+        db.query("SELECT * FROM layer_1")
+            .then(function (data) {
+                res.send(data);
+            })
+            .catch(function (error) {
+                res.send(error);
+            });
+    },
+
+    insert: function(req, res) {
+        db.query("INSERT INTO layer_1(geom) VALUES(${body})", req.body)
+            .then(function (data) {
+                res.status(201).send('Created');
+            })
+            .catch(function (error) {
+                res.send(error);
+            });
+    },
+
+    update: function(req, res) {
+        delupt(req, res, "UPDATE layer_1 SET geom=${geom} WHERE id=${id}");
+    },
+
+    delete: function(req, res) {
+        delupt(req, res, "DELETE FROM layer_1 WHERE id=${id}");
+    }
 }
 
 
+module.exports.database = function(req, res) {
+    
+    if(!req.body.action) { 
+        res.send(false);
+        return;
+    }
 
-/*
-
-var cn = {
-    host: 'localhost', // server name or IP address;
-    port: 5432,
-    database: 'cadastre-site',
-    user: 'postgres',
-    password: 'root'
-};
-
-var db = pgp(cn);*/
-/*
-db.query("SELECT * FROM layer_1")
-    .then(function (data) {
-        console.log("DATA:", data.map(x => x.name));
-    })
-    .catch(function (error) {
-        console.log("ERROR:", error);
-    });
-*/
-/*
-db.query("INSERT INTO layer_1(name) VALUES(${text})", req.body)
-    .then(function (data) {
-        console.log("success");
-    })
-    .catch(function (error) {
-        console.log(error);
-    })
-
-
-
-	
-	res.send('OK');*/
+    handler[req.body.action](req, res);
+}
