@@ -1,0 +1,9 @@
+.сontrolLayer {
+	width: 100%;
+	height: 50px;
+	padding: 5px;
+}
+
+.сontrolLayer input[type='range'] {
+	width: 100%;
+}

@@ -1,5 +1,17 @@
-import { InterfaceMap } from './map/map.js';
+import { InterfaceMap, setLayerFromDB } from './map/map.js';
 import ModalForm from './modalform/modalform.js';
+import React from 'react';
+import ReactDom from 'react-dom';
+
+
+import { ControlLayer } from './controlLayer/controlLayer.js';
+
+
+
+let setRole = function(user) {
+	InterfaceMap.setRole(user);
+
+}
 
 let requestToDB = function(jsonbody, onreadystatechange) {
 	let xhr = new XMLHttpRequest();
@@ -10,15 +22,32 @@ let requestToDB = function(jsonbody, onreadystatechange) {
 	xhr.send(JSON.stringify(jsonbody));
 }
 
+let xhr = new XMLHttpRequest();
+xhr.open("POST", '/user', true);
+xhr.onreadystatechange = function() { 
+	if(xhr.readyState!= 4) return;
+	console.log(xhr.response);
+	setRole(xhr.response);
+}
+xhr.send();
+
 requestToDB(
 	{ action: 'select' },
 	function(xhr) {
 		return x =>  { 
 			if (xhr.readyState != 4) return;
   			let response = JSON.parse(xhr.response);
-  			response.map(x => InterfaceMap.setFromDB(x.geom, x.id));
+  			response.map(x => setLayerFromDB(x.geom, x.id));
   		}
 	}
+);
+  		
+ReactDom.render(
+	<div>
+		<ControlLayer name='Слой №1' />
+  		<ControlLayer name='Слой №2' />
+  	</div>,
+  	document.getElementById('toolbar-right')
 );
 
 let controller = {

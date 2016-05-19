@@ -13,12 +13,13 @@ var db = pgp(connection);
 
 var delupt = function(req, res, query) {
         var body = req.body.body;
-        body.forEach( x => {
-                db.query(query, x)
-                    .then(data => {})
-                    .catch(error => {});
-            });
-        res.send('Done!');
+        db.task(t => t.batch(body.map(x => t.none(query, x))))
+            .then(function (data) {
+                res.status(200).send('ОК');
+            })
+            .catch(function (error) {
+                res.send(error);
+            });;
 }
 
 var handler = {
