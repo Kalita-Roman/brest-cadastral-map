@@ -24,7 +24,7 @@ var delupt = function(req, res, query) {
 
 var handler = {
     select: function(req, res) {
-        db.query("SELECT * FROM layer_1")
+        db.query("SELECT * FROM $1~", [req.body.layer])
             .then(function (data) {
                 res.send(data);
             })
@@ -34,7 +34,7 @@ var handler = {
     },
 
     insert: function(req, res) {
-        db.query("INSERT INTO layer_1(geom) VALUES(${body})", req.body)
+        db.query("INSERT INTO ${layer~}(geom, name) VALUES(${geom}, ${name})", req.body.body)
             .then(function (data) {
                 res.status(201).send('Created');
             })
@@ -44,11 +44,11 @@ var handler = {
     },
 
     update: function(req, res) {
-        delupt(req, res, "UPDATE layer_1 SET geom=${geom} WHERE id=${id}");
+        delupt(req, res, "UPDATE ${layer~} SET geom=${geom} WHERE id=${id}");
     },
 
     delete: function(req, res) {
-        delupt(req, res, "DELETE FROM layer_1 WHERE id=${id}");
+        delupt(req, res, "DELETE FROM ${layer~} WHERE id=${id}");
     }
 }
 

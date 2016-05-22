@@ -2,6 +2,20 @@
 	width: 100%;
 	height: 50px;
 	padding: 5px;
+	background-color: #fff;
+}
+
+.сontrolLayer.check {
+	background-color: #dfd;
+}
+
+.сontrolLayer input[type='checkbox'] {
+	float: left;
+}
+
+.сontrolLayer h3 {
+	float: left;
+	margin-left: 10px;
 }
 
 .сontrolLayer input[type='range'] {

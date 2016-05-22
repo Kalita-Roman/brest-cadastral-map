@@ -5,21 +5,58 @@
 	<title>Document</title>
 	<style>
 		* {
-			margin-bottom: 5px;
+			padding: 0;
+			margin: 0;
 		}
-		label {
+
+		body {
+			background-color: #f0f0f0;
+		}
+
+		form {
+			width: 300px;
+			background-color: #fff;
+			padding: 25px;
+			border-radius: 7px;
+			box-shadow: 0 0 10px rgba(0,0,0,0.5);
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+		}
+
+		input[type="text"],
+		input[type="password"] {
+			width: 286px;
+			padding: 5px;
+			margin-bottom: 10px;
+			text-align: center;
+		}
+
+		input[type="submit"] {
 			display: block;
-			width: 200px;
+			width:  300px;
+			line-height: 30px;
+			border: none;
+			cursor: pointer;
+			font-size: 16px;
+			border-radius: 5px;
+			font-weight: bold;
+			text-transform: uppercase;
+			background-color: inherit;
+			border: 1px solid #222;
+		}
+
+		input[type="submit"]:hover {
+			background-color: #dfd;
 		}
 	</style>
 </head>
 <body>
 	<form action="/login" method="post">
-		<label for="username">user<input type="text" name="username" /></label>
-		<label for="password">pass<input type="password" name="password" /></label>
-		<div>
-			<input type="submit" value="Submit"/>
-		</div>
+		<input type="text" name="username" placeholder="Пользователь" />
+		<input type="password" name="password" placeholder="Пароль" />
+		<input type="submit" value="Войти"/>
 	</form>
 </body>
 </html>

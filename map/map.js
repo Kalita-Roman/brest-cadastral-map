@@ -3,30 +3,18 @@ import L from 'leaflet';
 import Ldraw from 'leaflet-draw';
 
 import { map } from './map-brest.js';
+import mapContolls from './map-drawControls.js';
 
-let addControls = function() {
-    console.log('add сontrols');
-    let edit = {
-          featureGroup: featureGroup
-        };
 
-    let drawControl = new L.Control.Draw({
-        edit: edit,
-        draw: {
-            polygon: true,
-            polyline: false,
-            rectangle: false,
-            circle: false,
-            marker: false
-        }
-    }).addTo(map);
+let managerControls = new mapContolls(map);
 
-    removeControls = () => { drawControl.removeFrom(map); console.log('remove сontrols'); }
+let featureGroups = {
+   // layer_1: L.featureGroup().addTo(map),
+   // layer_2: L.featureGroup().addTo(map)
 }
 
-let removeControls = () => {};
-
-let featureGroup = L.featureGroup().addTo(map);
+//let featureGroup = featureGroups.layer_1;
+//managerControls.setLayer(featureGroup);
 
 var options_layer = {
       color: '#aaf',      // Stroke color
@@ -34,12 +22,16 @@ var options_layer = {
       fillOpacity: 0.7    // Fill opacity
   };
 
-
 let setLayer = function(layer, result) {
     if(!result) return;
     layer.bindPopup(result.data.name);
-    layer.setStyle(options_layer);
-    featureGroup.addLayer(layer);
+   // layer.setStyle(options_layer);
+    console.log(managerControls.currentLayer);
+
+    let cl = managerControls.currentLayer();
+    console.log(cl);
+    cl.addLayer(layer);
+    //featureGroup.addLayer(layer);
 }
 
 let InterfaceMap = {
@@ -62,10 +54,7 @@ let InterfaceMap = {
     },
 
     setRole : function (role) {
-        if(role !== 'false') 
-            addControls();
-        else
-            removeControls();
+        role.setMap(managerControls);
     }
 }
 
@@ -89,12 +78,21 @@ function takeLayers(e) {
 
 module.exports.InterfaceMap = InterfaceMap;
 
-module.exports.setLayerFromDB = function(geoJson, id, options, data) {
-    function style(feature) {
-        return options_layer;
-    };
+module.exports.setLayerFromDB = function(records, setterStyle, nameLayer) {
+    let groupUsed = new L.featureGroup().addTo(map);
+    groupUsed.nameLayer = nameLayer;
+    featureGroups[nameLayer] = groupUsed;
+    records.forEach(record => {
+        let newLayer = L.polygon(JSON.parse(record.geom).geometry.coordinates[0].map(x => [x[1], x[0]]), options_layer );
+        newLayer.idObj = record.id;
+        newLayer.bindPopup(record.name);
+        groupUsed.addLayer(newLayer);
+    });
+    groupUsed.setStyle( { color: setterStyle.color } );
+    setterStyle.setAcceptor((x) => groupUsed.setStyle( { fillOpacity: x } ));
+}
 
-    let newLayer = L.polygon(JSON.parse(geoJson).geometry.coordinates[0].map(x => [x[1], x[0]]), options_layer );
-    newLayer.idObj = id;
-    featureGroup.addLayer(newLayer);
+module.exports.setCurrentLayer = function(nameLayer) {
+    let featureGroup = featureGroups[nameLayer];
+    managerControls.setLayer(featureGroup);
 }

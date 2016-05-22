@@ -52,8 +52,6 @@ module.exports.FormInput = React.createClass({
 		return (<div className='form-input'>
 					<div className='form-content'>
 						<FieldText label='Название объекта' setData={x => data.name = x} />
-						<FieldText label='Заказчик' setData={x => data.customer = x} />
-						<FieldText label='Дата' setData={x => data.date = x} />
 					</div>
 					<div className='buttomsbar'>
 						<Button text='Принять' click={() => this.props.handleClick(handleOk())} />
@@ -61,4 +59,6 @@ module.exports.FormInput = React.createClass({
 					</div>
 				</div>)
 	}
+						//<FieldText label='Заказчик' setData={x => data.customer = x} />
+						//<FieldText label='Дата' setData={x => data.date = x} />
 });
