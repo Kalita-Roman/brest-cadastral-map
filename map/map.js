@@ -8,13 +8,7 @@ import mapContolls from './map-drawControls.js';
 
 let managerControls = new mapContolls(map);
 
-let featureGroups = {
-   // layer_1: L.featureGroup().addTo(map),
-   // layer_2: L.featureGroup().addTo(map)
-}
-
-//let featureGroup = featureGroups.layer_1;
-//managerControls.setLayer(featureGroup);
+let featureGroups = new Map();
 
 var options_layer = {
       color: '#aaf',      // Stroke color
@@ -26,12 +20,7 @@ let setLayer = function(layer, result) {
     if(!result) return;
     layer.bindPopup(result.data.name);
    // layer.setStyle(options_layer);
-    console.log(managerControls.currentLayer);
-
-    let cl = managerControls.currentLayer();
-    console.log(cl);
-    cl.addLayer(layer);
-    //featureGroup.addLayer(layer);
+    managerControls.currentLayer().addLayer(layer);
 }
 
 let InterfaceMap = {
@@ -81,7 +70,7 @@ module.exports.InterfaceMap = InterfaceMap;
 module.exports.setLayerFromDB = function(records, setterStyle, nameLayer) {
     let groupUsed = new L.featureGroup().addTo(map);
     groupUsed.nameLayer = nameLayer;
-    featureGroups[nameLayer] = groupUsed;
+    featureGroups.set(nameLayer, groupUsed);
     records.forEach(record => {
         let newLayer = L.polygon(JSON.parse(record.geom).geometry.coordinates[0].map(x => [x[1], x[0]]), options_layer );
         newLayer.idObj = record.id;
@@ -92,7 +81,27 @@ module.exports.setLayerFromDB = function(records, setterStyle, nameLayer) {
     setterStyle.setAcceptor((x) => groupUsed.setStyle( { fillOpacity: x } ));
 }
 
-module.exports.setCurrentLayer = function(nameLayer) {
-    let featureGroup = featureGroups[nameLayer];
-    managerControls.setLayer(featureGroup);
+module.exports.setCurrentLayer = function(nameLayer, load) {
+    let setLayer = () => { 
+        let La = featureGroups.get(nameLayer);
+        managerControls.setLayer(La) 
+    };
+
+    if(!featureGroups.has(nameLayer)) {
+        load(setLayer);
+    }
+    else {
+        setLayer();
+    }
+}
+
+
+
+module.exports.removeLayer = function(nameLayer) {
+    let groupUsed = featureGroups.get(nameLayer);
+    console.log(groupUsed);
+    groupUsed.onRemove(map);
+    featureGroups.delete(nameLayer);
+
+
 }

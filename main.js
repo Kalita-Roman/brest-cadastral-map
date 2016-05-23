@@ -1,10 +1,12 @@
-import { InterfaceMap, setLayerFromDB, setCurrentLayer } from './map/map.js';
+import { InterfaceMap, setLayerFromDB, setCurrentLayer, removeLayer } from './map/map.js';
 import ModalForm from './modalform/modalform.js';
 import React from 'react';
 import ReactDom from 'react-dom';
 
 import { ControlLayer } from './controlLayer/controlLayer.js';
 import { getUser } from './users.js';
+
+import pubsub from './src/pubsub.js';
 
 let SetterStyle = function(opacity, _color) {
 	let _acceptor;
@@ -40,6 +42,21 @@ let requestToDB = function(jsonbody, onreadystatechange) {
 	xhr.send(JSON.stringify(jsonbody));
 }
 
+let loadLayer = function(layer, afterSetInMap) {
+	requestToDB(
+			{ 	
+				action: 'select', 
+				layer: layer.nameTable 
+			},
+			function(xhr) {
+		  		let response = JSON.parse(xhr.response);
+		  		setLayerFromDB(response, layer.setterStyle, layer.nameMap);
+		  		if(afterSetInMap)
+		  			afterSetInMap(layer);
+			}
+		);
+}
+
 let xhr = new XMLHttpRequest();
 xhr.open("POST", '/user', true);
 xhr.onreadystatechange = function() { 
@@ -52,44 +69,38 @@ const ControllerLayers = {
 	currentLayer: null,
 
 	layers:  [
-		{ name:'Слой №1', nameTable: 'layer_1', nameMap: 'layer_1', setterStyle: new SetterStyle(0.7, '#aaf'), current: false },
-		{ name:'Слой №2', nameTable: 'layer_2', nameMap: 'layer_2', setterStyle: new SetterStyle(0.7, '#faf'), current: true }
+		{ name:'Слой №1', nameTable: 'layer_1', nameMap: 'layer_1', setterStyle: new SetterStyle(0.7, '#aaf'), current: true },
+		{ name:'Слой №2', nameTable: 'layer_2', nameMap: 'layer_2', setterStyle: new SetterStyle(0.7, '#faf'), current: false }
 	],
 
 	setCheck(key) {
 		this.currentLayer = this.layers[key];
-		setCurrentLayer(this.currentLayer.nameMap);
-		this._listeners.forEach(x => x(key));
+		setCurrentLayer(this.currentLayer.nameMap, x => loadLayer(this.currentLayer, x));
+		pubsub.publish('setCheck_controlsLayer', key);
 	},
-
-	_listeners: [],
-
-	addListener(listener) {
-		this._listeners.push(listener);
-	}
 }
 
+pubsub.subscribe('changeVisibleLayer', x => {  
+	let layer = ControllerLayers.layers[x.key];
+	if(!x.visible)
+		removeLayer(layer.nameMap);
+	else
+		loadLayer(layer);
+});
+
 ControllerLayers.layers.forEach( layer => {
-	requestToDB(
-		{ 	
-			action: 'select', 
-			layer: layer.nameTable 
-		},
-		function(xhr) {
-	  		let response = JSON.parse(xhr.response);
-	  		setLayerFromDB(response, layer.setterStyle, layer.nameMap);
-	  		if(layer.current)
-	  			setCurrentLayer(layer.nameMap);
-		}
-	);
+	loadLayer(layer, () => {
+		if(layer.current) ControllerLayers.setCheck(ControllerLayers.layers.indexOf(layer));
+	})
 });
 
 let setRole = function(user) {
 
 	InterfaceMap.setRole(user);
 
+	pubsub.subscribe('dblClick_controlsLayer', x => ControllerLayers.setCheck(x));
 	let controlsLayer =  ControllerLayers.layers.map((x, i) => 
-		<ControlLayer key={i} name={x.name} idKey={i} setterStyle={x.setterStyle} controller={ControllerLayers} user={user}/>
+		<ControlLayer key={i} name={x.name} idKey={i} setterStyle={x.setterStyle} user={user} pubsub={pubsub}/>
 	);
 	
 	ReactDom.render(
@@ -98,10 +109,6 @@ let setRole = function(user) {
 	  	</div>,
 	  	document.getElementById('toolbar-right')
 	);
-
-//	ControllerLayers.setCheck(0);
-//	setCurrentLayer(ControllerLayers.layers[0].nameMap);
-	
 };
 
 
@@ -156,6 +163,8 @@ let controller = {
 	}
 }
 
-InterfaceMap.setListener('input', controller.listenMapInsert.bind(controller));
-InterfaceMap.setListener('update',controller.listenMapUpdate.bind(controller));
-InterfaceMap.setListener('delete',controller.listenMapDelete.bind(controller));
+const axts = [
+	['input', 'listenMapInsert'],
+	['update', 'listenMapUpdate'],
+	['delete', 'listenMapDelete']
+].forEach(x => InterfaceMap.setListener(x[0], controller[x[1]].bind(controller)));

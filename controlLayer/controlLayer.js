@@ -6,20 +6,21 @@ let ControlLayer = React.createClass({
 		this.props.user.setСontroll(this);
 		return { 
 			opacity: this.props.setterStyle.currentOpacity,
-			checked: false
+			checked: false,
+			show: true
 		}
 	},
 
 	setVisitor() {
-		this.getClass = () => "сontrolLayer";
+		this.getClass = () => "controlLayer";
 	},
 
 	setEditor() {
-		this.props.controller.addListener(x => this.makeCurrent(x));
+		this.props.pubsub.subscribe('setCheck_controlsLayer', x => this.makeCurrent(x));
 		this.getClass = () => {
 			 return this.state.checked 
-			? "сontrolLayer check"
-			: "сontrolLayer";
+			? "controlLayer check"
+			: "controlLayer";
 		}
 	},
 
@@ -32,16 +33,16 @@ let ControlLayer = React.createClass({
 	},
 
 	handlerСheckbox(e) {
-	/*	e.stopPropagation();
+		e.stopPropagation();
 		let newState = this.state;
-		newState.checked = !newState.checked;
-		this.replaceState(newState);*/
-		//this.replaceState( { checked: !this.state.checked, opacity: e.target.value } );
+		newState.show = !newState.show;
+		this.setState(newState);
+		this.props.pubsub.publish('changeVisibleLayer', { key: this.props.idKey, visible: newState.show });
 	},
 
 	handlerDoubleClick(e) {
 		e.stopPropagation();
-		this.props.controller.setCheck(this.props.idKey);
+		this.props.pubsub.publish('dblClick_controlsLayer', this.props.idKey);
 	},
 
 	handlerDoubleClick_empty(e) { },
@@ -49,13 +50,14 @@ let ControlLayer = React.createClass({
 	makeCurrent(key) {
 		let newState = this.state;
 		newState.checked = this.props.idKey === key;
+		newState.show = true;
 		this.setState(newState);
 	},
 
 	render() { 
 		return (
 		<div className={this.getClass()} onDoubleClick={this.handlerDoubleClick} >
-			<input type='checkbox' checked={this.state.checked} onChange={this.handlerСheckbox} />
+			<input type='checkbox' checked={this.state.show} onChange={this.handlerСheckbox} />
 			<h3>{this.props.name}</h3>
 			<input type='range' min="0" max="1" step="0.05" value={this.state.opacity} onChange={this.handlerRange} />
 		</div>

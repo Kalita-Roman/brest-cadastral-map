@@ -1,23 +1,23 @@
-.сontrolLayer {
+.controlLayer {
 	width: 100%;
 	height: 50px;
 	padding: 5px;
 	background-color: #fff;
 }
 
-.сontrolLayer.check {
+.controlLayer.check {
 	background-color: #dfd;
 }
 
-.сontrolLayer input[type='checkbox'] {
+.controlLayer input[type='checkbox'] {
 	float: left;
 }
 
-.сontrolLayer h3 {
+.controlLayer h3 {
 	float: left;
 	margin-left: 10px;
 }
 
-.сontrolLayer input[type='range'] {
+.controlLayer input[type='range'] {
 	width: 100%;
 }
