@@ -5,30 +5,36 @@ import Ldraw from 'leaflet-draw';
 import { map } from './map-brest.js';
 import mapContolls from './map-drawControls.js';
 
-
 let managerControls = new mapContolls(map);
 
+let currentLayer = null;
 let featureGroups = new Map();
 
 var options_layer = {
-      color: '#aaf',      // Stroke color
-      weight: null,         // Stroke weight
-      fillOpacity: 0.7    // Fill opacity
-  };
+    clickable: true,
+    fill: true,
+    noClip: false,
+    opacity: 0.5,
+    smoothFactor: 1,
+    stroke: true,
+    weight: null,         // Stroke weight
+};
+
+let updateStyleLayer = function(layer) {
+    layer.options = options_layer;
+    layer.setStyle(currentLayer.style);
+}
 
 let setLayer = function(layer, result) {
     if(!result) return;
     layer.bindPopup(result.data.name);
-   // layer.setStyle(options_layer);
-    managerControls.currentLayer().addLayer(layer);
+    updateStyleLayer(layer);
+    currentLayer.layer.addLayer(layer);
 }
 
 let InterfaceMap = {
 
     _listeners: {},
-
-    _listener : () => {},
-    _listenerUpdate : () => {},
 
     setListener : function(name, listener) {
         this._listeners[name] = listener;
@@ -47,8 +53,8 @@ let InterfaceMap = {
     }
 }
 
-map.on('draw:created', function(inputedShape) {
-    InterfaceMap.getListener('input')(inputedShape.layer, setLayer);
+map.on('draw:created', function(e) {
+    InterfaceMap.getListener('input')(e.layer, setLayer);
 });
 
 map.on('draw:edited', function(e) {
@@ -62,29 +68,43 @@ map.on('draw:deleted', function(e) {
 function takeLayers(e) {
     let layers = [];
     e.layers.eachLayer(x => layers.push(x));
+    layers.forEach(updateStyleLayer);
     return layers;
 }
 
-module.exports.InterfaceMap = InterfaceMap;
+function createLayer(e) {
+    return {
+        e: e,
+        cb: setLayer
+    }
+}
+
+module.exports.CityMap = InterfaceMap;
 
 module.exports.setLayerFromDB = function(records, setterStyle, nameLayer) {
+
+    let convertGeom = function(geom) {
+        return JSON.parse(geom).geometry.coordinates[0].map(x => [x[1], x[0]]);
+    }
+
     let groupUsed = new L.featureGroup().addTo(map);
     groupUsed.nameLayer = nameLayer;
-    featureGroups.set(nameLayer, groupUsed);
     records.forEach(record => {
-        let newLayer = L.polygon(JSON.parse(record.geom).geometry.coordinates[0].map(x => [x[1], x[0]]), options_layer );
-        newLayer.idObj = record.id;
-        newLayer.bindPopup(record.name);
-        groupUsed.addLayer(newLayer);
+        let obj = L.polygon(convertGeom(record.geom), options_layer );
+        obj.idObj = record.id;
+        obj.bindPopup(record.name);
+        groupUsed.addLayer(obj);
     });
-    groupUsed.setStyle( { color: setterStyle.color } );
+    let style = { color: setterStyle.color, fillOpacity: setterStyle.currentOpacity };
+    groupUsed.setStyle( style );
     setterStyle.setAcceptor((x) => groupUsed.setStyle( { fillOpacity: x } ));
+    featureGroups.set(nameLayer, { layer: groupUsed, style: style } );
 }
 
 module.exports.setCurrentLayer = function(nameLayer, load) {
     let setLayer = () => { 
-        let La = featureGroups.get(nameLayer);
-        managerControls.setLayer(La) 
+        currentLayer = featureGroups.get(nameLayer);
+        managerControls.setLayer(currentLayer.layer);
     };
 
     if(!featureGroups.has(nameLayer)) {
@@ -95,13 +115,9 @@ module.exports.setCurrentLayer = function(nameLayer, load) {
     }
 }
 
-
-
 module.exports.removeLayer = function(nameLayer) {
     let groupUsed = featureGroups.get(nameLayer);
     console.log(groupUsed);
-    groupUsed.onRemove(map);
+    groupUsed.layer.onRemove(map);
     featureGroups.delete(nameLayer);
-
-
 }

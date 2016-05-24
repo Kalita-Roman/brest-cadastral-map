@@ -49,3 +49,15 @@ module.exports.show = function(callBack) {
 				}
 	 } );
 }
+
+module.exports.showForm = function() {
+	return new Promise((resolve, reject) => {
+		f( {
+			value: true,
+			handleClick(res) {
+					resolve(res);
+					f({ value: false });
+				}
+	 	} );
+	})
+}

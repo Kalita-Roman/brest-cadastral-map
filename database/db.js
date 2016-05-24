@@ -10,12 +10,11 @@ var connection = {
 
 var db = pgp(connection);
 
-
 var delupt = function(req, res, query) {
         var body = req.body.body;
         db.task(t => t.batch(body.map(x => t.none(query, x))))
             .then(function (data) {
-                res.status(200).send('ОК');
+                res.status(200).send('OK');
             })
             .catch(function (error) {
                 res.send(error);
@@ -34,9 +33,9 @@ var handler = {
     },
 
     insert: function(req, res) {
-        db.query("INSERT INTO ${layer~}(geom, name) VALUES(${geom}, ${name})", req.body.body)
+        db.query("INSERT INTO ${layer~}(geom, name) VALUES(${geom}, ${name}) returning id", req.body.body)
             .then(function (data) {
-                res.status(201).send('Created');
+                res.status(201).send(data);
             })
             .catch(function (error) {
                 res.send(error);

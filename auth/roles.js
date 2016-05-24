@@ -1,6 +1,5 @@
 module.exports.getUser = function(responce) {
 	if(!responce || responce === 'false') return userVisitor;
-	responce = JSON.parse(responce);
 	return table[responce.type];
 }
 

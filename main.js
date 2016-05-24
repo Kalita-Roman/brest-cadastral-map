@@ -1,10 +1,10 @@
-import { InterfaceMap, setLayerFromDB, setCurrentLayer, removeLayer } from './map/map.js';
+import { CityMap, setLayerFromDB, setCurrentLayer, removeLayer } from './map/map.js';
 import ModalForm from './modalform/modalform.js';
 import React from 'react';
 import ReactDom from 'react-dom';
 
 import { ControlLayer } from './controlLayer/controlLayer.js';
-import { getUser } from './users.js';
+import { getUser } from './auth/roles.js';
 
 import pubsub from './src/pubsub.js';
 
@@ -30,40 +30,42 @@ let SetterStyle = function(opacity, _color) {
 	}
 }
 
-let requestToDB = function(jsonbody, onreadystatechange) {
-	let xhr = new XMLHttpRequest();
-	xhr.open('POST', '/db', true);
-	xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-	if(onreadystatechange)
-		xhr.onreadystatechange = () => { 
-			if(xhr.readyState != 4) return;
-			onreadystatechange(xhr); 
+let request = function(typeReq, url, body) {
+	return new Promise((resolve, reject) => {
+		let xhr = new XMLHttpRequest();
+		xhr.open(typeReq, url, true);
+		xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+		xhr.onload = function() {
+			if (200 <= this.status && this.status < 300) {
+				if(this.response === 'OK') return;
+				resolve(JSON.parse(this.response));
+		    } else {
+		    	console.log('err');
+		        var error = new Error(this.statusText);
+		        error.code = this.status;
+		        reject(error);
+		    }
 		}
-	xhr.send(JSON.stringify(jsonbody));
+		xhr.send(JSON.stringify(body));
+	});
+}
+
+let requestToDB = function(body, onreadystatechange) {
+	request('POST', '/db', body)
+	.then(onreadystatechange);
 }
 
 let loadLayer = function(layer, afterSetInMap) {
-	requestToDB(
-			{ 	
-				action: 'select', 
-				layer: layer.nameTable 
-			},
-			function(xhr) {
-		  		let response = JSON.parse(xhr.response);
-		  		setLayerFromDB(response, layer.setterStyle, layer.nameMap);
-		  		if(afterSetInMap)
-		  			afterSetInMap(layer);
-			}
-		);
+	let body = { 	
+		action: 'select', 
+		layer: layer.nameTable 
+	};
+	requestToDB(body, x => {
+		setLayerFromDB(x, layer.setterStyle, layer.nameMap);
+		if(afterSetInMap)
+		  	afterSetInMap(layer);
+	});
 }
-
-let xhr = new XMLHttpRequest();
-xhr.open("POST", '/user', true);
-xhr.onreadystatechange = function() { 
-	if(xhr.readyState!= 4) return;
-	setRole(getUser(xhr.response));
-}
-xhr.send();
 
 const ControllerLayers = {
 	currentLayer: null,
@@ -80,6 +82,9 @@ const ControllerLayers = {
 	},
 }
 
+request('POST', '/user')
+	.then(x => setRole(getUser(x)));
+
 pubsub.subscribe('changeVisibleLayer', x => {  
 	let layer = ControllerLayers.layers[x.key];
 	if(!x.visible)
@@ -95,8 +100,7 @@ ControllerLayers.layers.forEach( layer => {
 });
 
 let setRole = function(user) {
-
-	InterfaceMap.setRole(user);
+	CityMap.setRole(user);
 
 	pubsub.subscribe('dblClick_controlsLayer', x => ControllerLayers.setCheck(x));
 	let controlsLayer =  ControllerLayers.layers.map((x, i) => 
@@ -113,26 +117,35 @@ let setRole = function(user) {
 
 
 let controller = {
-	inputedShape: null,
-
-	addObj(x) { 
-		InterfaceMap.setInMap(this.inputedShape, x);
-
-		let jsonbody = {
-			action: 'insert',
-			body: {
-				layer: ControllerLayers.currentLayer.nameTable,
-				geom: this.inputedShape.toGeoJSON(),
-				name: x.data.name
-			}
-		}
-		requestToDB(jsonbody);
-	},
-
 	listenMapInsert(inputedShape, insertInMap) {
-		this.inputedShape = inputedShape;
-		ModalForm.show(this.addObj.bind(this));
+		let res;
+		ModalForm.showForm()
+		.then(x => { 
+			let body = {
+				action: 'insert',
+				body: {
+					layer: ControllerLayers.currentLayer.nameTable,
+					geom: inputedShape.toGeoJSON(),
+					name: x.data.name
+				}
+			};
+			res = x;
+			return request('POST', '/db', body);
+		})
+		.then(y => {
+			console.log(y);
+			inputedShape.idObj = y[0].id;
+			insertInMap(inputedShape, res);
+		});
 	},
+
+	createBody: function(name, layers,  convert) {
+		return {
+			action: name,
+			body: layers.map(convert)
+		}
+	},
+
 
 	listenMapUpdate(layers) {
 		let convert = x => { return {
@@ -140,13 +153,8 @@ let controller = {
 			id: x.idObj,
 			geom: x.toGeoJSON()
 		} }
-
-		let jsonbody = {
-			action: 'update',
-			body: layers.map(convert)
-		}
-
-		requestToDB(jsonbody);
+		
+		requestToDB(this.createBody('update', layers, convert));
 	},
 
 	listenMapDelete(layers) {
@@ -155,16 +163,12 @@ let controller = {
 			id: x.idObj,
 		} }
 
-		let jsonbody = {
-			action: 'delete',
-			body: layers.map(convert)
-		}
-		requestToDB(jsonbody);
+		requestToDB(this.createBody('delete', layers, convert));
 	}
 }
 
-const axts = [
+const actions = [
 	['input', 'listenMapInsert'],
 	['update', 'listenMapUpdate'],
 	['delete', 'listenMapDelete']
-].forEach(x => InterfaceMap.setListener(x[0], controller[x[1]].bind(controller)));
+].forEach(x => CityMap.setListener(x[0], controller[x[1]].bind(controller)));

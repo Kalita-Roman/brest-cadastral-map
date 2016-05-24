@@ -5,6 +5,7 @@ module.exports = function ControlsMap(map) {
 
 	let drawControl;
 	let _currentLayer = L.featureGroup();
+    let allowAddControl = () => {};
 
 	this.currentLayer = function() {  
 		return _currentLayer;
@@ -22,6 +23,7 @@ module.exports = function ControlsMap(map) {
                 marker: false
             }
         }).addTo(map);
+        allowAddControl = () => this.addControls();
     },
 
     this.removeControls = function() {
@@ -31,6 +33,8 @@ module.exports = function ControlsMap(map) {
 
     this.setLayer = function(layer) {
     	_currentLayer = layer;
-        this.addControls();
+        allowAddControl();
     }
+
+
 }

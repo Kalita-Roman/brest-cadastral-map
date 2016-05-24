@@ -13,6 +13,7 @@ let ControlLayer = React.createClass({
 
 	setVisitor() {
 		this.getClass = () => "controlLayer";
+		this.getHandlerDblClick = () => { return () => {}; }
 	},
 
 	setEditor() {
@@ -22,10 +23,10 @@ let ControlLayer = React.createClass({
 			? "controlLayer check"
 			: "controlLayer";
 		}
+		this.getHandlerDblClick = () => { return (e) => this.handlerDoubleClick(e); }
 	},
 
 	handlerRange(e) {
-		e.stopPropagation();
 		let newState = this.state;
 		newState.opacity = e.target.value;
 		this.setState(newState);
@@ -56,7 +57,7 @@ let ControlLayer = React.createClass({
 
 	render() { 
 		return (
-		<div className={this.getClass()} onDoubleClick={this.handlerDoubleClick} >
+		<div className={this.getClass()} onDoubleClick={this.getHandlerDblClick()} >
 			<input type='checkbox' checked={this.state.show} onChange={this.handlerСheckbox} />
 			<h3>{this.props.name}</h3>
 			<input type='range' min="0" max="1" step="0.05" value={this.state.opacity} onChange={this.handlerRange} />
