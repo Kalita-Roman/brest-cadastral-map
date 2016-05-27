@@ -1,6 +1,8 @@
 module.exports.getUser = function(responce) {
 	if(!responce || responce === 'false') return userVisitor;
-	return table[responce.type];
+	var result = table[responce.type];
+	result.user = responce;
+	return result;
 }
 
 const userVisitor = {

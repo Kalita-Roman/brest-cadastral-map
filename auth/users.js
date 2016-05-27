@@ -1,7 +1,35 @@
-var records = [
+/*var records = [
     { id: 1, username: 'user', password: 'user', type: 'visitor' },
     { id: 2, username: 'editor', password: 'editor', type: 'editor' },
-    { id: 3, username: 'default', password: 'default', type: 'default' }
+    { id: 3, username: '123', password: '123', type: 'editor' },
+    { id: 4, username: 'qwe', password: 'qwe', type: 'editor' },
+    { id: 5, username: 'default', password: 'default', type: 'default' }
+];*/
+
+var records = [
+    { id: 1, username: 'user', password: 'user', user: {
+        type: 'visitor', 
+        id: 0
+    } },
+    { id: 2, username: 'editor', password: 'editor', user: { 
+        name: 'editor',
+        type: 'editor',
+        id: 1
+    } },
+    { id: 3, username: '123', password: '123', user: {
+        name: '123',
+        type: 'editor',
+        id: 2
+    } },
+    { id: 4, username: 'qwe', password: 'qwe',  user: {
+        name: 'qwe',
+        type: 'editor',
+        id: 3
+    }},
+    { id: 5, username: 'default', password: 'default',  user: {
+        type: 'default',
+        id: 4
+    }}
 ];
 
 exports.findById = function(id, cb) {

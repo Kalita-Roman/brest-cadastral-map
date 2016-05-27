@@ -3,7 +3,7 @@ var pgp = require("pg-promise")();
 var connection = {
     	host: 'localhost', // server name or IP address;
     	port: 5432,
-    	database: 'cadastre-site',
+    	database: 'brestdb',
     	user: 'postgres',
     	password: 'root'
 	};
@@ -33,7 +33,8 @@ var handler = {
     },
 
     insert: function(req, res) {
-        db.query("INSERT INTO ${layer~}(geom, name) VALUES(${geom}, ${name}) returning id", req.body.body)
+    	req.body.body.editingDate = new Date();
+        db.query("INSERT INTO ${layer~}(geom, name, editor, editing_date) VALUES(${geom}, ${name}, ${editor}, ${editingDate}) returning id", req.body.body)
             .then(function (data) {
                 res.status(201).send(data);
             })
@@ -43,12 +44,35 @@ var handler = {
     },
 
     update: function(req, res) {
-        delupt(req, res, "UPDATE ${layer~} SET geom=${geom} WHERE id=${id}");
+    	var dateNow = new Date();
+    	req.body.body.forEach(x => x.editingDate = dateNow);
+        delupt(req, res, "UPDATE ${layer~} SET geom=${geom}, editor=${editor}, editing_date=${editingDate} WHERE id=${id}");
     },
 
     delete: function(req, res) {
         delupt(req, res, "DELETE FROM ${layer~} WHERE id=${id}");
-    }
+    },
+
+    edit: function(req, res) {
+        db.query("SELECT * FROM ${layer~} WHERE id=${id}", req.body.body)
+            .then(function (data) {
+                res.send(data);
+            })
+            .catch(function (error) {
+                res.send(error);
+            });
+    },
+
+    updateChanges: function(req, res) {
+    	req.body.body.editingDate = new Date();
+        db.query("UPDATE ${layer~} SET name=${name}, editor=${editor}, editing_date=${editingDate} WHERE id=${id}", req.body.body)
+            .then(function (data) {
+                res.status(201).send(data);
+            })
+            .catch(function (error) {
+                res.send(error);
+            });
+    },
 }
 
 

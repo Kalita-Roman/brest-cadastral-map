@@ -1,8 +1,13 @@
 .controlLayer {
 	width: 100%;
-	height: 50px;
+	/*height: 50px;*/
+	float: left;
 	padding: 5px;
 	background-color: #fff;
+	border-bottom: 1px solid #777; 
+}
+
+.controlLayer:not(:last-child) {
 }
 
 .controlLayer.check {
@@ -20,4 +25,10 @@
 
 .controlLayer input[type='range'] {
 	width: 100%;
+}
+
+.controlLayer button {
+	width: 100%;
+	height: 20px;
+	float: left;
 }

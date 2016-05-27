@@ -8,9 +8,9 @@ import mapContolls from './map-drawControls.js';
 let managerControls = new mapContolls(map);
 
 let currentLayer = null;
-let featureGroups = new Map();
+let layersOnMap = new Map();
 
-var options_layer = {
+var common_options_layer = {
     clickable: true,
     fill: true,
     noClip: false,
@@ -20,16 +20,47 @@ var options_layer = {
     weight: null,         // Stroke weight
 };
 
-let updateStyleLayer = function(layer) {
-    layer.options = options_layer;
-    layer.setStyle(currentLayer.style);
+let LayerEntity = function(_name, _lft_layer, setterStyle) {
+    this.lft_layer = _lft_layer;
+    this.style = { color: setterStyle.color, fillOpacity: setterStyle.currentOpacity };
+    setterStyle.setAcceptor((x) => _lft_layer.setStyle( { fillOpacity: x } ));
+    _lft_layer.nameLayer = _name;
+
+    this.addShape = function(lft_shapeObj, record) {
+        lft_shapeObj.idObj = record.id;
+        lft_shapeObj.addEventListener('click', createHandlerClick(record.name));
+        lft_shapeObj.options = common_options_layer;
+        lft_shapeObj.setStyle(this.style);
+        lft_shapeObj.nameLayer = _name;
+        _lft_layer.addLayer(lft_shapeObj);
+    }
 }
 
-let setLayer = function(layer, result) {
-    if(!result) return;
-    layer.bindPopup(result.data.name);
-    updateStyleLayer(layer);
-    currentLayer.layer.addLayer(layer);
+let createHandlerClick = function(msgPopup) {
+     let handlButtonLeft = function(e) {
+        let popup = L.popup()
+            .setContent(msgPopup);
+        e.target
+            .bindPopup(popup)
+            .openPopup(e.latlng)
+            .unbindPopup();
+    }
+
+    let handlButtonMiddle = function(e) {
+        let target = e.target;
+        InterfaceMap.publish('edit', { id: target.idObj, layer: target.nameLayer });
+    }
+
+    return function(e) {
+        let handler = e.originalEvent.button === 1
+            ? handlButtonMiddle
+            : handlButtonLeft
+        handler(e);
+    }
+}
+
+let setLayer = function(shapeObj, record) {
+    currentLayer.addShape(shapeObj, record);
 }
 
 let InterfaceMap = {
@@ -40,12 +71,8 @@ let InterfaceMap = {
         this._listeners[name] = listener;
     },
 
-    getListener : function (name) {
-        return this._listeners[name];
-    },
-
-    setInMap : function (e, result) {
-        setLayer(e, result);
+    publish : function (name, data) {
+        this._listeners[name](data);
     },
 
     setRole : function (role) {
@@ -53,29 +80,30 @@ let InterfaceMap = {
     }
 }
 
-map.on('draw:created', function(e) {
-    InterfaceMap.getListener('input')(e.layer, setLayer);
+let actions = [
+    ['draw:created', 'input', createShape],
+    ['draw:edited', 'update', takeShape],
+    ['draw:deleted', 'delete', takeShape]
+].forEach(x => {
+    map.on(x[0], y => InterfaceMap.publish(x[1], x[2](y)) );
 });
 
-map.on('draw:edited', function(e) {
-    InterfaceMap.getListener('update')(takeLayers(e));
-});
+let updateStyleLayer = function(shapeObj) {
+    shapeObj.options = common_options_layer;
+    shapeObj.setStyle(currentLayer.style);
+}
 
-map.on('draw:deleted', function(e) {
-    InterfaceMap.getListener('delete')(takeLayers(e));
-});
-
-function takeLayers(e) {
+function takeShape(e) {
     let layers = [];
     e.layers.eachLayer(x => layers.push(x));
     layers.forEach(updateStyleLayer);
     return layers;
 }
 
-function createLayer(e) {
+function createShape(e) {
     return {
-        e: e,
-        cb: setLayer
+        shapeObj: e.layer,
+        setShapeInMap: setLayer
     }
 }
 
@@ -87,27 +115,24 @@ module.exports.setLayerFromDB = function(records, setterStyle, nameLayer) {
         return JSON.parse(geom).geometry.coordinates[0].map(x => [x[1], x[0]]);
     }
 
-    let groupUsed = new L.featureGroup().addTo(map);
-    groupUsed.nameLayer = nameLayer;
+    let newLayerUsed = new L.featureGroup().addTo(map);
+
+    let layerEntity = new LayerEntity(nameLayer, newLayerUsed, setterStyle);
+    layersOnMap.set( nameLayer, layerEntity );
+
     records.forEach(record => {
-        let obj = L.polygon(convertGeom(record.geom), options_layer );
-        obj.idObj = record.id;
-        obj.bindPopup(record.name);
-        groupUsed.addLayer(obj);
+        let shapeObj = L.polygon(convertGeom(record.geom), common_options_layer );
+        layerEntity.addShape(shapeObj, record);
     });
-    let style = { color: setterStyle.color, fillOpacity: setterStyle.currentOpacity };
-    groupUsed.setStyle( style );
-    setterStyle.setAcceptor((x) => groupUsed.setStyle( { fillOpacity: x } ));
-    featureGroups.set(nameLayer, { layer: groupUsed, style: style } );
 }
 
 module.exports.setCurrentLayer = function(nameLayer, load) {
     let setLayer = () => { 
-        currentLayer = featureGroups.get(nameLayer);
-        managerControls.setLayer(currentLayer.layer);
+        currentLayer = layersOnMap.get(nameLayer);
+        managerControls.setLayer(currentLayer.lft_layer);
     };
 
-    if(!featureGroups.has(nameLayer)) {
+    if(!layersOnMap.has(nameLayer)) {
         load(setLayer);
     }
     else {
@@ -116,8 +141,7 @@ module.exports.setCurrentLayer = function(nameLayer, load) {
 }
 
 module.exports.removeLayer = function(nameLayer) {
-    let groupUsed = featureGroups.get(nameLayer);
-    console.log(groupUsed);
-    groupUsed.layer.onRemove(map);
-    featureGroups.delete(nameLayer);
+    let groupUsed = layersOnMap.get(nameLayer);
+    groupUsed.lft_layer.onRemove(map);
+    layersOnMap.delete(nameLayer);
 }

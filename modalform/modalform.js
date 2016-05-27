@@ -2,9 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './modalform.css';
 import { FormInput } from './forminput.js'
-
-
-
+import { FormFilter_1 } from './formFilter_1.js'
 
 let Shadow = React.createClass({
 	render: function() {
@@ -12,25 +10,25 @@ let Shadow = React.createClass({
 	}
 });
 
-let f;
+let setState;
 
 let FormBox = React.createClass({
 	
 	getInitialState: function() {
-    	return { value: false };
+    	return { visible: false };
   	},
 
   	componentDidMount() {
-  		f = this.setState.bind(this);
+  		setState = this.setState.bind(this);
   	},
 
 	render: function() {
-		if(!this.state.value) 
+		if(!this.state.visible) 
 			return (<div></div>);
 
 		return (<div>
 			<Shadow />
-			<FormInput handleClick = {this.state.handleClick}/>
+			{this.state.form}
 		</div>)
 	}
 });
@@ -40,24 +38,56 @@ ReactDOM.render(
     document.getElementById('modalform')
 );
 
-module.exports.show = function(callBack) {
-	f( {
-			value: true,
-			handleClick(res) {
-					callBack(res);
-					f({ value: false });
-				}
-	 } );
+let func_1 = function(typeform) {
+	if(typeform === 'input') { return f1; };
+	if(typeform === 'filter_1') {};
 }
 
-module.exports.showForm = function() {
-	return new Promise((resolve, reject) => {
-		f( {
-			value: true,
-			handleClick(res) {
-					resolve(res);
-					f({ value: false });
-				}
+let f1 = function(user, data) {
+	return function(resolve, reject) {
+
+		let handlActions = function(res) {
+			if(res)
+				resolve(res);
+			setState({ visible: false });
+		};
+
+		setState( {
+			visible: true,
+			form: <FormInput handleClick={handlActions} data={data} user={user} />
 	 	} );
-	})
+	};
+}
+
+let f2 = function(user, data) {
+	return function(resolve, reject) {
+		let handlActions = function(res) {
+			if(res)
+				resolve(res);
+			setState({ visible: false });
+		};
+
+		setState( {
+			visible: true,
+			form: <FormFilter_1 handleClick={handlActions} data={data} />
+	 	} );
+	}
+}
+
+
+module.exports.showForm = function(user, data, typeform) {
+
+	//let f0 = func_1(typeform)(user, data);
+	let ff = f1(user, data);
+
+	return new Promise(ff);
+}
+
+
+
+
+module.exports.show = function() {
+	return new Promise((resolve, reject) => {
+		
+	});
 }

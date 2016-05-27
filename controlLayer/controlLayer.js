@@ -46,6 +46,10 @@ let ControlLayer = React.createClass({
 		this.props.pubsub.publish('dblClick_controlsLayer', this.props.idKey);
 	},
 
+	showFormFileters(e) {
+		this.props.pubsub.publish('showFormFilter', this.props.idKey);	
+	},
+
 	handlerDoubleClick_empty(e) { },
 
 	makeCurrent(key) {
@@ -61,6 +65,7 @@ let ControlLayer = React.createClass({
 			<input type='checkbox' checked={this.state.show} onChange={this.handlerСheckbox} />
 			<h3>{this.props.name}</h3>
 			<input type='range' min="0" max="1" step="0.05" value={this.state.opacity} onChange={this.handlerRange} />
+			<button onClick={this.showFormFileters} >фильтры</button>
 		</div>
 	)}
 });

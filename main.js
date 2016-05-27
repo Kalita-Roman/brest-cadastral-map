@@ -22,13 +22,15 @@ let SetterStyle = function(opacity, _color) {
 	this.setAcceptor = function(acceptor) {
 		acceptor(opacity);
 		this._acceptor = acceptor;
-	}
+	};
 
 	this.setOpacity = function(value) {
 		opacity = value;
 		this._acceptor(value);
-	}
+	};
 }
+
+let role;
 
 let request = function(typeReq, url, body) {
 	return new Promise((resolve, reject) => {
@@ -40,7 +42,6 @@ let request = function(typeReq, url, body) {
 				if(this.response === 'OK') return;
 				resolve(JSON.parse(this.response));
 		    } else {
-		    	console.log('err');
 		        var error = new Error(this.statusText);
 		        error.code = this.status;
 		        reject(error);
@@ -58,10 +59,11 @@ let requestToDB = function(body, onreadystatechange) {
 let loadLayer = function(layer, afterSetInMap) {
 	let body = { 	
 		action: 'select', 
-		layer: layer.nameTable 
+		layer: layer.nameTable,
+		filters: {} 
 	};
 	requestToDB(body, x => {
-		setLayerFromDB(x, layer.setterStyle, layer.nameMap);
+		setLayerFromDB(x, layer.setterStyle, layer.nameTable);
 		if(afterSetInMap)
 		  	afterSetInMap(layer);
 	});
@@ -71,15 +73,28 @@ const ControllerLayers = {
 	currentLayer: null,
 
 	layers:  [
-		{ name:'Слой №1', nameTable: 'layer_1', nameMap: 'layer_1', setterStyle: new SetterStyle(0.7, '#aaf'), current: true },
-		{ name:'Слой №2', nameTable: 'layer_2', nameMap: 'layer_2', setterStyle: new SetterStyle(0.7, '#faf'), current: false }
+		{ name:'Слой №1', nameTable: 'layer_1', setterStyle: new SetterStyle(0.7, '#aaf'), current: true },
+		{ name:'Слой №2', nameTable: 'layer_2', setterStyle: new SetterStyle(0.7, '#faf'), current: false }
 	],
 
 	setCheck(key) {
 		this.currentLayer = this.layers[key];
-		setCurrentLayer(this.currentLayer.nameMap, x => loadLayer(this.currentLayer, x));
+		setCurrentLayer(this.currentLayer.nameTable, x => loadLayer(this.currentLayer, x));
 		pubsub.publish('setCheck_controlsLayer', key);
 	},
+
+	loadLayers() {
+		this.layers.forEach( layer => {
+			loadLayer(layer, () => {
+				if(layer.current) this.setCheck(this.layers.indexOf(layer));
+			})
+		});
+	},
+
+	showFilerForm(key) {
+		let layer = this.layers[key];
+		ModalForm.showForm(role);
+	}
 }
 
 request('POST', '/user')
@@ -88,18 +103,23 @@ request('POST', '/user')
 pubsub.subscribe('changeVisibleLayer', x => {  
 	let layer = ControllerLayers.layers[x.key];
 	if(!x.visible)
-		removeLayer(layer.nameMap);
+		removeLayer(layer.nameTable);
 	else
 		loadLayer(layer);
 });
+pubsub.subscribe('showFormFilter', ControllerLayers.showFilerForm.bind(ControllerLayers));
 
+ControllerLayers.loadLayers();
+/*
 ControllerLayers.layers.forEach( layer => {
 	loadLayer(layer, () => {
 		if(layer.current) ControllerLayers.setCheck(ControllerLayers.layers.indexOf(layer));
 	})
 });
+*/
 
 let setRole = function(user) {
+	role = user;
 	CityMap.setRole(user);
 
 	pubsub.subscribe('dblClick_controlsLayer', x => ControllerLayers.setCheck(x));
@@ -117,25 +137,27 @@ let setRole = function(user) {
 
 
 let controller = {
-	listenMapInsert(inputedShape, insertInMap) {
+
+	listenMapInsert(e) {
+		let inputedShape = e.shapeObj;
 		let res;
-		ModalForm.showForm()
+		ModalForm.showForm(role)
 		.then(x => { 
+			res = x.data;
 			let body = {
 				action: 'insert',
 				body: {
 					layer: ControllerLayers.currentLayer.nameTable,
 					geom: inputedShape.toGeoJSON(),
-					name: x.data.name
+					name: res.name,
+					editor: role.user.id
 				}
 			};
-			res = x;
 			return request('POST', '/db', body);
 		})
 		.then(y => {
-			console.log(y);
-			inputedShape.idObj = y[0].id;
-			insertInMap(inputedShape, res);
+			res.id = y[0].id;
+			e.setShapeInMap(inputedShape, res);
 		});
 	},
 
@@ -151,7 +173,8 @@ let controller = {
 		let convert = x => { return {
 			layer: ControllerLayers.currentLayer.nameTable,
 			id: x.idObj,
-			geom: x.toGeoJSON()
+			geom: x.toGeoJSON(),
+			editor: role.user.id
 		} }
 		
 		requestToDB(this.createBody('update', layers, convert));
@@ -164,11 +187,41 @@ let controller = {
 		} }
 
 		requestToDB(this.createBody('delete', layers, convert));
+	},
+
+	listenEdit(e) {
+		let body = {
+			action: 'edit',
+			body: {
+				layer: e.layer,
+				id: e.id
+			}
+		};
+		request('POST', '/db', body)
+			.then(x => {
+				let data = {
+					name: x[0].name
+				};
+				return ModalForm.showForm(role, data);
+			})
+			.then(x => { 
+				let body = {
+					action: 'updateChanges',
+					body: {
+						layer: e.layer,
+						id: e.id,
+						name: x.data.name,
+						editor: role.user.id
+					}
+				};
+				return request('POST', '/db', body)
+			})
 	}
 }
 
 const actions = [
 	['input', 'listenMapInsert'],
 	['update', 'listenMapUpdate'],
-	['delete', 'listenMapDelete']
+	['delete', 'listenMapDelete'],
+	['edit', 'listenEdit']
 ].forEach(x => CityMap.setListener(x[0], controller[x[1]].bind(controller)));

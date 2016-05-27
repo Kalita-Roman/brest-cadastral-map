@@ -27,13 +27,16 @@ passport.use(new Strategy(
 // serializing, and querying the user record by ID from the database when
 // deserializing.
 passport.serializeUser(function(user, cb) {
+  console.log('serializeUser');
+  console.log(user);
   cb(null, user.id);
 });
 
 passport.deserializeUser(function(id, cb) {
   dbUsers.findById(id, function (err, user) {
     if (err) { return cb(err); }
-    cb(null, user);
+    // user --> user.user
+    cb(null, user.user);
   });
 });
 
