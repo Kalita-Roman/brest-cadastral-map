@@ -38,7 +38,7 @@ var delupt = function(req, res, query) {
 
 var handler = {
     select: function(req, res) {
-        db.query("SELECT * FROM $1~", [req.body.layer])
+        db.any("SELECT * FROM $1~", [req.body.layer])
             .then(function (data) {
                 if(req.body.filters) {
                     console.log();
@@ -57,7 +57,7 @@ var handler = {
 
     insert: function(req, res) {
     	req.body.body.editingDate = new Date();
-        db.query("INSERT INTO ${layer~}(geom, name, editor, editing_date) VALUES(${geom}, ${name}, ${editor}, ${editingDate}) returning id", req.body.body)
+        db.one("INSERT INTO ${layer~}(geom, name, editor, editing_date) VALUES(${geom}, ${name}, ${editor}, ${editingDate}) returning id", req.body.body)
             .then(function (data) {
                 res.status(201).send(data);
             })
@@ -77,7 +77,7 @@ var handler = {
     },
 
     edit: function(req, res) {
-        db.query("SELECT * FROM ${layer~} WHERE id=${id}", req.body.body)
+        db.any("SELECT * FROM ${layer~} WHERE id=${id}", req.body.body)
             .then(function (data) {
                 res.send(data);
             })
@@ -88,7 +88,7 @@ var handler = {
 
     updateChanges: function(req, res) {
     	req.body.body.editingDate = new Date();
-        db.query("UPDATE ${layer~} SET name=${name}, editor=${editor}, editing_date=${editingDate} WHERE id=${id}", req.body.body)
+        db.none("UPDATE ${layer~} SET name=${name}, editor=${editor}, editing_date=${editingDate} WHERE id=${id}", req.body.body)
             .then(function (data) {
                 res.status(201).send(data);
             })
