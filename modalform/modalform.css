@@ -29,6 +29,18 @@
 	background-color: #fff;
 }
 
+.form-input h1 {
+	width: 100%;
+	text-align: center;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.form-input h2 {
+	font-size: 18px;
+	font-weight: bold;
+}
+
 .form-content {
 	width: 100%;
 	padding: 10px;
@@ -41,15 +53,6 @@
 	
 }
 
-.form-button {
-	width: 70px;
-	line-height: 30px;
-	border: 1px solid #333;
-	border-radius: 5px;
-	cursor: pointer;
-	background-color: inherit;
-}
-
 .form-button:not(:first-child) {
 	margin-left: 10px; 
 }
@@ -58,7 +61,9 @@
 	margin-bottom: 20px;
 }
 
-
+.inline {
+	display: inline-block;
+}
 
 .input-box .label {
 	display: block;
@@ -68,5 +73,4 @@
 	line-height: 16px;
 	display: block;	
 	font-size: 14px;
-	/*border: 1px solid gray;*/
 }

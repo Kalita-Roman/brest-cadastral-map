@@ -10,22 +10,45 @@ var connection = {
 
 var db = pgp(connection);
 
+var filter = function(filters) {
+    var f = filters[0];
+    var fils = [];
+    if(f.start) fils.push(x => new Date(f.start) <= x);
+    if(f.end) fils.push(x => new Date(f.end) >= x);
+
+    var check = function(record) {
+        return fils.every(x => x(new Date(record.editing_date)));
+    }
+
+    return function(data) {
+        return data.filter(check);
+    }
+}
+
 var delupt = function(req, res, query) {
-        var body = req.body.body;
-        db.task(t => t.batch(body.map(x => t.none(query, x))))
-            .then(function (data) {
-                res.status(200).send('OK');
-            })
-            .catch(function (error) {
-                res.send(error);
-            });;
+    var body = req.body.body;
+    db.task(t => t.batch(body.map(x => t.none(query, x))))
+        .then(function (data) {
+            res.status(200).send('OK');
+        })
+        .catch(function (error) {
+            res.send(error);
+        });;
 }
 
 var handler = {
     select: function(req, res) {
         db.query("SELECT * FROM $1~", [req.body.layer])
             .then(function (data) {
-                res.send(data);
+                if(req.body.filters) {
+                    console.log();
+                    console.log();
+                    console.log(req.body.filters);
+                    res.send(filter(req.body.filters)(data));
+                }
+                else {
+                    res.send(data);
+                }
             })
             .catch(function (error) {
                 res.send(error);

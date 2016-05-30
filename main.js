@@ -51,22 +51,21 @@ let request = function(typeReq, url, body) {
 	});
 }
 
-let requestToDB = function(body, onreadystatechange) {
-	request('POST', '/db', body)
-	.then(onreadystatechange);
+let requestToDB = function(body) {
+	return request('POST', '/db', body)
 }
 
 let loadLayer = function(layer, afterSetInMap) {
 	let body = { 	
 		action: 'select', 
 		layer: layer.nameTable,
-		filters: {} 
 	};
-	requestToDB(body, x => {
-		setLayerFromDB(x, layer.setterStyle, layer.nameTable);
-		if(afterSetInMap)
-		  	afterSetInMap(layer);
-	});
+	requestToDB(body)
+		.then( x => {
+			setLayerFromDB(x, layer.setterStyle, layer.nameTable);
+			if(afterSetInMap)
+			  	afterSetInMap(layer);
+		});
 }
 
 const ControllerLayers = {
@@ -91,9 +90,31 @@ const ControllerLayers = {
 		});
 	},
 
-	showFilerForm(key) {
+	loadOneLayer(layer) {
+		loadLayer(layer, () => {
+			if(layer.current) this.setCheck(this.layers.indexOf(layer));
+		})
+	},
+
+	showFilterForm(key) {
 		let layer = this.layers[key];
-		ModalForm.showForm(role);
+		ModalForm.showForm(role, { layer: layer.name, filters: layer.filters }, 'fm_filter_1')
+			.then(filters => {
+				layer.filters = filters;
+
+				let body = { 	
+					action: 'select', 
+					layer: layer.nameTable,
+					filters: filters
+				};
+
+				requestToDB(body)
+					.then( x => {
+						removeLayer(layer.nameTable);
+						setLayerFromDB(x, layer.setterStyle, layer.nameTable);
+					});
+
+			});
 	}
 }
 
@@ -107,7 +128,7 @@ pubsub.subscribe('changeVisibleLayer', x => {
 	else
 		loadLayer(layer);
 });
-pubsub.subscribe('showFormFilter', ControllerLayers.showFilerForm.bind(ControllerLayers));
+pubsub.subscribe('showFormFilter', ControllerLayers.showFilterForm.bind(ControllerLayers));
 
 ControllerLayers.loadLayers();
 /*
@@ -141,7 +162,7 @@ let controller = {
 	listenMapInsert(e) {
 		let inputedShape = e.shapeObj;
 		let res;
-		ModalForm.showForm(role)
+		ModalForm.showForm(role, null, 'fm_input')
 		.then(x => { 
 			res = x.data;
 			let body = {
@@ -202,7 +223,7 @@ let controller = {
 				let data = {
 					name: x[0].name
 				};
-				return ModalForm.showForm(role, data);
+				return ModalForm.showForm(role, data, 'fm_input');
 			})
 			.then(x => { 
 				let body = {

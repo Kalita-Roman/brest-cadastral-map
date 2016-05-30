@@ -22,7 +22,7 @@ var common_options_layer = {
 
 let LayerEntity = function(_name, _lft_layer, setterStyle) {
     this.lft_layer = _lft_layer;
-    this.style = { color: setterStyle.color, fillOpacity: setterStyle.currentOpacity };
+    this.style = { color: setterStyle.color, fillColor: setterStyle.color, fillOpacity: setterStyle.currentOpacity };
     setterStyle.setAcceptor((x) => _lft_layer.setStyle( { fillOpacity: x } ));
     _lft_layer.nameLayer = _name;
 
@@ -87,6 +87,10 @@ let actions = [
 ].forEach(x => {
     map.on(x[0], y => InterfaceMap.publish(x[1], x[2](y)) );
 });
+
+map.on('draw:editstop', x => {
+    currentLayer.lft_layer.setStyle(currentLayer.style);
+} );
 
 let updateStyleLayer = function(shapeObj) {
     shapeObj.options = common_options_layer;

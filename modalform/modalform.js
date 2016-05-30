@@ -1,8 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+
+import FormInput from './forminput.js'
+import FormFilter_1 from './formFilter_1.js'
+
 import './modalform.css';
-import { FormInput } from './forminput.js'
-import { FormFilter_1 } from './formFilter_1.js'
 
 let Shadow = React.createClass({
 	render: function() {
@@ -38,56 +40,34 @@ ReactDOM.render(
     document.getElementById('modalform')
 );
 
-let func_1 = function(typeform) {
-	if(typeform === 'input') { return f1; };
-	if(typeform === 'filter_1') {};
+let factoryForm = function(typeform) {
+	if(typeform === 'fm_input') { return f1; };
+	if(typeform === 'fm_filter_1') { return f2; };
 }
 
-let f1 = function(user, data) {
-	return function(resolve, reject) {
-
-		let handlActions = function(res) {
-			if(res)
-				resolve(res);
-			setState({ visible: false });
-		};
-
-		setState( {
-			visible: true,
-			form: <FormInput handleClick={handlActions} data={data} user={user} />
-	 	} );
-	};
+let f1 = function(handlActions, data, user) {
+	return <FormInput handleClick={handlActions} data={data} user={user} />;
 }
 
-let f2 = function(user, data) {
-	return function(resolve, reject) {
-		let handlActions = function(res) {
-			if(res)
-				resolve(res);
-			setState({ visible: false });
-		};
-
-		setState( {
-			visible: true,
-			form: <FormFilter_1 handleClick={handlActions} data={data} />
-	 	} );
-	}
+let f2 = function(handlActions, data, user) {
+	return <FormFilter_1 handleClick={handlActions} data={data} user={user} />;
 }
-
 
 module.exports.showForm = function(user, data, typeform) {
 
-	//let f0 = func_1(typeform)(user, data);
-	let ff = f1(user, data);
+	let ff = function(resolve, reject) {
+
+		let handlActions = function(res) {
+			if(res)
+				resolve(res);
+			setState({ visible: false });
+		};
+
+		setState( {
+			visible: true,
+			form: factoryForm(typeform)(handlActions, data, user)
+	 	} );
+	};
 
 	return new Promise(ff);
-}
-
-
-
-
-module.exports.show = function() {
-	return new Promise((resolve, reject) => {
-		
-	});
 }
