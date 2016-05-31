@@ -7,14 +7,14 @@ let ControlLayer = React.createClass({
 	getInitialState() {
 		this.props.user.setСontroll(this);
 		return { 
-			opacity: this.props.setterStyle.currentOpacity,
+			opacity: this.props.layer.setterStyle.currentOpacity,
 			checked: false,
 			show: true
 		}
 	},
 
 	setVisitor() {
-		this.getClass = () => "controlLayer";
+		this.getClass = () => 'controlLayer';
 		this.getHandlerDblClick = () => { return () => {}; }
 		this.switchCurrenting = null;
 	},
@@ -27,7 +27,7 @@ let ControlLayer = React.createClass({
 		let newState = this.state;
 		newState.opacity = e.target.value;
 		this.setState(newState);
-		this.props.setterStyle.setOpacity(e.target.value);
+		this.props.layer.setterStyle.setOpacity(e.target.value);
 	},
 
 	handlerСheckbox(e) {
@@ -57,8 +57,10 @@ let ControlLayer = React.createClass({
 	render() { 
 		return (
 		<div className="controlLayer">
-			<input type='checkbox' checked={this.state.show} onChange={this.handlerСheckbox} />
-			<h3>{this.props.name}</h3>
+			<div style={{backgroundColor: this.props.layer.color}} className='box-color'>
+				<input type='checkbox' checked={this.state.show} onChange={this.handlerСheckbox} />
+			</div>
+			<h3>{this.props.layer.name}</h3>
 			{this.switchCurrenting}
 			<input type='range' min="0" max="1" step="0.05" value={this.state.opacity} onChange={this.handlerRange} />
 			<button onClick={this.showFormFileters} >фильтры</button>

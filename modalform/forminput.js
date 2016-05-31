@@ -53,6 +53,7 @@ module.exports = React.createClass({
 				</div>
 			)
   		}
+  		this.enable = false;
   	},
 
   	setEditor() {
@@ -64,6 +65,7 @@ module.exports = React.createClass({
 				</div>
 			)
   		}
+  		this.enable = true;
   	},
 	
 	handleOk() {
@@ -77,7 +79,7 @@ module.exports = React.createClass({
 		return (<div className='form-input'>
 					<div className='form-content'>
 						<div className="name">
-							<FieldText label='Название объекта' text={new WrapperData(this.data, 'name')} focus={true} />
+							<FieldText label='Название объекта' text={new WrapperData(this.data, 'name')} focus={true} enable={this.enable}/>
 						</div>
 					</div>
 					{this.getButtoms()}

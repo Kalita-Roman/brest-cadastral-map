@@ -27,7 +27,7 @@ var filter = function(filters) {
 
 var delupt = function(req, res, query) {
     var body = req.body.body;
-    db.task(t => t.batch(body.map(x => t.none(query, x))))
+    db.task(t => t.batch(body.map(x => t.one(query, x))))
         .then(function (data) {
             res.status(200).send('OK');
         })
@@ -41,9 +41,6 @@ var handler = {
         db.any("SELECT * FROM $1~", [req.body.layer])
             .then(function (data) {
                 if(req.body.filters) {
-                    console.log();
-                    console.log();
-                    console.log(req.body.filters);
                     res.send(filter(req.body.filters)(data));
                 }
                 else {

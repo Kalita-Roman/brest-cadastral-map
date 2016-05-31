@@ -14,8 +14,18 @@
 	background-color: #dfd;
 }
 
+.controlLayer .box-color {
+	width: 30px;
+	height: 30px;
+	float: left;
+	border-radius: 5px;
+	border: 1px solid #333;
+}
+
 .controlLayer input[type='checkbox'] {
 	float: left;
+	margin-left: -2px;
+	margin-top: -2px;
 }
 
 .controlLayer h3 {
