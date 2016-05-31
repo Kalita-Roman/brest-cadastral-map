@@ -5,6 +5,8 @@ import Ldraw from 'leaflet-draw';
 import { map } from './map-brest.js';
 import mapContolls from './map-drawControls.js';
 
+import './map.css';
+
 let managerControls = new mapContolls(map);
 
 let currentLayer = null;
@@ -26,6 +28,8 @@ let LayerEntity = function(_name, _lft_layer, setterStyle) {
     setterStyle.setAcceptor((x) => _lft_layer.setStyle( { fillOpacity: x } ));
     _lft_layer.nameLayer = _name;
 
+    this.tableObj = new Map();
+
     this.addShape = function(lft_shapeObj, record) {
         lft_shapeObj.idObj = record.id;
         lft_shapeObj.addEventListener('click', createHandlerClick(record.name));
@@ -33,6 +37,18 @@ let LayerEntity = function(_name, _lft_layer, setterStyle) {
         lft_shapeObj.setStyle(this.style);
         lft_shapeObj.nameLayer = _name;
         _lft_layer.addLayer(lft_shapeObj);
+
+        let label = this.createLabel(record, lft_shapeObj);
+
+        this.tableObj.set(record.id, { label: label });
+    }
+
+    this.createLabel = function (record, shape) {
+        let labelIcon = L.divIcon({
+            className: 'map-label',
+            html: `<p>${record.name}</p>`
+        });
+        return L.marker(shape.getBounds().getCenter(), {icon: labelIcon}).addTo(_lft_layer);
     }
 }
 
@@ -48,7 +64,16 @@ let createHandlerClick = function(msgPopup) {
 
     let handlButtonMiddle = function(e) {
         let target = e.target;
-        InterfaceMap.publish('edit', { id: target.idObj, layer: target.nameLayer });
+        let targetLayer = layersOnMap.get(target.nameLayer);
+        let lft_layer = targetLayer.lft_layer;
+        let rowTable = targetLayer.tableObj.get(target.idObj);
+        let label = rowTable.label;
+        console.log(label);
+        InterfaceMap.publish('edit', { id: target.idObj, layer: target.nameLayer, cb (xe) { 
+            console.log(xe);
+            lft_layer.removeLayer(label);
+            rowTable.label = targetLayer.createLabel(xe, target);
+        } });
     }
 
     return function(e) {

@@ -2,6 +2,7 @@ import React from 'react';
 import Button from './button/button.js';
 import FieldText from './fieldText/fieldText.js';
 import './modalform.css';
+import './forminput.css';
 
 let WrapperData = function(data, name) {
 	this.set = function(value) {
@@ -12,8 +13,6 @@ let WrapperData = function(data, name) {
 		return data[name];
 	}
 }
-
-
 
 let getButtomsVisitor = function() {
 	return (
@@ -77,7 +76,9 @@ module.exports = React.createClass({
 	render: function() {
 		return (<div className='form-input'>
 					<div className='form-content'>
-						<FieldText label='Название объекта' text={new WrapperData(this.data, 'name')}/>
+						<div className="name">
+							<FieldText label='Название объекта' text={new WrapperData(this.data, 'name')} focus={true} />
+						</div>
 					</div>
 					{this.getButtoms()}
 				</div>)

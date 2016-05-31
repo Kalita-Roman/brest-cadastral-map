@@ -2,8 +2,9 @@ import { CityMap, setLayerFromDB, setCurrentLayer, removeLayer } from './map/map
 import ModalForm from './modalform/modalform.js';
 import React from 'react';
 import ReactDom from 'react-dom';
+//import Calendar from 'react-input-calendar';
 
-import { ControlLayer } from './controlLayer/controlLayer.js';
+import { ControlLayer } from './controls/controlLayer/controlLayer.js';
 import { getUser } from './auth/roles.js';
 
 import pubsub from './src/pubsub.js';
@@ -62,6 +63,17 @@ let loadLayer = function(layer, afterSetInMap) {
 	};
 	requestToDB(body)
 		.then( x => {
+			//console.log(x);
+			var dates = x.map(y => new Date(y.editing_date));
+			var maxDate = Math.max.apply(Math, dates);
+			var minDate = Math.min.apply(Math, dates);
+
+			layer.filters = [ {
+				filterName: 'rangeDate',
+				start: new Date(minDate),
+				end: new Date(maxDate)
+			} ];
+
 			setLayerFromDB(x, layer.setterStyle, layer.nameTable);
 			if(afterSetInMap)
 			  	afterSetInMap(layer);
@@ -177,7 +189,7 @@ let controller = {
 			return request('POST', '/db', body);
 		})
 		.then(y => {
-			res.id = y[0].id;
+			res.id = y.id;
 			e.setShapeInMap(inputedShape, res);
 		});
 	},
@@ -218,6 +230,7 @@ let controller = {
 				id: e.id
 			}
 		};
+		let editedRecord;
 		request('POST', '/db', body)
 			.then(x => {
 				let data = {
@@ -226,17 +239,21 @@ let controller = {
 				return ModalForm.showForm(role, data, 'fm_input');
 			})
 			.then(x => { 
+				editedRecord = x.data;
 				let body = {
 					action: 'updateChanges',
 					body: {
 						layer: e.layer,
 						id: e.id,
-						name: x.data.name,
+						name: editedRecord.name,
 						editor: role.user.id
 					}
 				};
 				return request('POST', '/db', body)
 			})
+			.then(x => {
+				e.cb(editedRecord)
+			});
 	}
 }
 

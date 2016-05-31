@@ -1,0 +1,27 @@
+.button-led-round {
+	float: right;
+	width: 32px;
+	height: 32px;
+	padding: 4px;
+	border-radius: 50%;
+	background: radial-gradient(circle closest-side, #777 78%, #fff 89%, #777 100%);
+}
+
+.button-led-body {
+	width: 24px;
+	height: 24px;
+	background-color: #f00;
+	border-radius: 50%;
+}
+
+.button-led-body:hover{
+	cursor: pointer;
+}
+
+.button-led-body.button-on {
+	background: radial-gradient(circle at 33% 33%, #fff 4%, #f99 17%, #f00 33%, #900 83%);
+}
+
+.button-led-body.button-off {
+	background: radial-gradient(circle at 33% 33%, #fff 4%, #ccc 17%, #bbb 33%, #555 83%);
+}

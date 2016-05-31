@@ -1,6 +1,8 @@
 import React from 'react';
 import './controlLayer.css';
 
+import ButtonLed from '../button-led/button-led.js';
+
 let ControlLayer = React.createClass({
 	getInitialState() {
 		this.props.user.setСontroll(this);
@@ -14,16 +16,11 @@ let ControlLayer = React.createClass({
 	setVisitor() {
 		this.getClass = () => "controlLayer";
 		this.getHandlerDblClick = () => { return () => {}; }
+		this.switchCurrenting = null;
 	},
 
 	setEditor() {
 		this.props.pubsub.subscribe('setCheck_controlsLayer', x => this.makeCurrent(x));
-		this.getClass = () => {
-			 return this.state.checked 
-			? "controlLayer check"
-			: "controlLayer";
-		}
-		this.getHandlerDblClick = () => { return (e) => this.handlerDoubleClick(e); }
 	},
 
 	handlerRange(e) {
@@ -41,8 +38,7 @@ let ControlLayer = React.createClass({
 		this.props.pubsub.publish('changeVisibleLayer', { key: this.props.idKey, visible: newState.show });
 	},
 
-	handlerDoubleClick(e) {
-		e.stopPropagation();
+	handlerSwitchCurrent() {
 		this.props.pubsub.publish('dblClick_controlsLayer', this.props.idKey);
 	},
 
@@ -50,20 +46,20 @@ let ControlLayer = React.createClass({
 		this.props.pubsub.publish('showFormFilter', this.props.idKey);	
 	},
 
-	handlerDoubleClick_empty(e) { },
-
 	makeCurrent(key) {
 		let newState = this.state;
-		newState.checked = this.props.idKey === key;
 		newState.show = true;
+		this.switchCurrenting = <ButtonLed onClick={this.handlerSwitchCurrent} on={this.props.idKey === key} />
 		this.setState(newState);
+
 	},
 
 	render() { 
 		return (
-		<div className={this.getClass()} onDoubleClick={this.getHandlerDblClick()} >
+		<div className="controlLayer">
 			<input type='checkbox' checked={this.state.show} onChange={this.handlerСheckbox} />
 			<h3>{this.props.name}</h3>
+			{this.switchCurrenting}
 			<input type='range' min="0" max="1" step="0.05" value={this.state.opacity} onChange={this.handlerRange} />
 			<button onClick={this.showFormFileters} >фильтры</button>
 		</div>

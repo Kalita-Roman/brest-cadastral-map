@@ -1,6 +1,8 @@
 import React from 'react';
+import Calendar from 'react-input-calendar';
 import FieldText from './../fieldText/fieldText.js';
 import './date.css';
+import './../../node_modules/react-input-calendar/style/index.css'
 
 let WrapperText = function(data, cb) {
 	this.set = function(value) {
@@ -21,18 +23,25 @@ module.exports = React.createClass({
 
 	componentWillMount() {
 		this.text = {
-			date : this.props.date ? this.props.date.toISOString().slice(0, 10) : ''
+			date : this.props.date.toLocaleString().slice(0, 10)
 		}
   	},
 
-  	handlText(text) {
-  		console.log(text);
+  	onChange(e) {
+  		var date = new Date(e);
+  		this.props.accept(date);
   	},
 
 	render: function() {
 		return (
 			<div className='inline'>
-				<FieldText label={this.props.label} text={new WrapperText(this.text, this.props.accept)} />
+				<Calendar 
+					format='DD/MM/YYYY' 
+					date={this.props.date}
+					onChange={this.onChange}
+					hideOnBlur={true} 
+					inputName='name_1'
+					/>
 			</div>
 		)
 	}

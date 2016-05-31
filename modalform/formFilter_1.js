@@ -3,34 +3,14 @@ import Button from './button/button.js';
 import CtrlDate from './date/date.js';
 import './modalform.css';
 
-
-const start = { value: null };
-const end = { value: null };
-
-let Wrapper = function()
-{
-
-}
-
-
 module.exports = React.createClass({
 	
-	f1: {
-		filterName: 'rangeDate',
-		start: null,
-		end: null
-	},
-
 	HandleOk() {
-		console.log(this.f1);
 		return [ this.f1 ];
 	},
 
 	render: function() {
-		let range = null;
-		if( this.props.data.filters )
-			this.f1 = this.props.data.filters.find(x => x.filterName === 'rangeDate');
-		console.log(this.f1);
+		this.f1 = this.props.data.filters.find(x => x.filterName === 'rangeDate');
 
 		return (<div className='form-input'>
 					<div className='form-content'>
