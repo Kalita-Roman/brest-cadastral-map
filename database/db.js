@@ -129,14 +129,10 @@ var handler = {
         });
 
 	    var ptab = new Promise((resolve, reject) => {
-	    	var getTable = (x, t) => {
-                return new Promise((resolve, reject) => {
-                    t.any("SELECT * FROM $1~", [x])
-						.then(data => {
-							resolve({name: x, data: data});
-						})
-					});
-                }
+	    	
+	    var getTable = (name, t) => t.any("SELECT * FROM $1~", name)
+                .then(data => ({name, data}));
+
             db.task(t => t.batch(req.body.tables.map(x => getTable(x, t))))
             	.then(data => {
             		resolve({ name:'t', value: data });
