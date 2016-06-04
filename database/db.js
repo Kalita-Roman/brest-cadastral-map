@@ -1,25 +1,23 @@
 var pgp = require("pg-promise")();
 
-
+/*
 var connection = {
     	host: 'localhost',
     	port: 5432,
-//    	database: 'cd',
 		database: 'brestdb',
     	user: 'postgres',
- //   	password: 'pass'
     	password: 'root'
 	};
-
-/*
-var connection = {
-        host: 'ec2-23-23-162-78.compute-1.amazonaws.com',
-        port: 5432,
-        database: 'd88b2fmsbmie2q',
-        user: 'dpnsnduzfqpghf',
-        password: 'w-_JN76Y5kDzH28N29fINxWLN_'
-    };
 */
+
+var connection = {
+        host: 'ec2-54-243-204-195.compute-1.amazonaws.com',
+        port: 5432,
+        database: 'degu98g3me9l74',
+        user: 'iqujckjxjswxii',
+        password: '_DSzPBjQ3VAVk_gZTGP7lgogir'
+    };
+
 
 var db = pgp(connection);
 
