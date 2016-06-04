@@ -121,7 +121,7 @@ var handler = {
 
 	    var ptab = new Promise((resolve, reject) => {
 	    	
-	    var getTable = (x, t) =>t.any("SELECT * FROM $1~", [x])
+	    var getTable = (x, t) =>t.any("SELECT * FROM $1~", x)
                 .then(data => ({name: x, data: data}));
 
             db.task(t => t.batch(req.body.tables.map(x => getTable(x, t))))
