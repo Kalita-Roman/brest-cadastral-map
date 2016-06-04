@@ -30,6 +30,7 @@ app.use(passport.session());
 
 app.get('/', function (req, res) {
   	res.sendFile('index.html', { root: __dirname } , (e) => { if(e) console.log(e); });
+    //res.send('Работает');
 });
 
 app.get('/login',
@@ -66,6 +67,6 @@ app.post('/user',
 
 
 
-app.listen(8080, function () {
+app.listen(process.env.PORT || 8080, function () {
   	console.log('Example app listening on port 8080!');
 });

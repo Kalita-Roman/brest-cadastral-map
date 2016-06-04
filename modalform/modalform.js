@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import FormInput from './forminput.js'
-import FormFilter_1 from './formFilter_1.js'
+import FormFilter from './formFilter.js'
 
 import './modalform.css';
 
@@ -42,7 +42,7 @@ ReactDOM.render(
 
 let factoryForm = function(typeform) {
 	if(typeform === 'fm_input') { return f1; };
-	if(typeform === 'fm_filter_1') { return f2; };
+	if(typeform === 'fm_filter') { return f2; };
 }
 
 let f1 = function(handlActions, data, user) {
@@ -50,7 +50,7 @@ let f1 = function(handlActions, data, user) {
 }
 
 let f2 = function(handlActions, data, user) {
-	return <FormFilter_1 handleClick={handlActions} data={data} user={user} />;
+	return <FormFilter handleClick={handlActions} data={data} user={user} />;
 }
 
 module.exports.showForm = function(user, data, typeform) {

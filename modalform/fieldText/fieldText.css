@@ -1,3 +1,7 @@
+.input-box label {
+	margin-bottom: 3px;
+}
+
 .input-box input {
 	width: 100%;
 }

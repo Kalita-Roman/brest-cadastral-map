@@ -28,9 +28,9 @@ module.exports = React.createClass({
     render: function() {
     		return (
       			<div className='input-box' >
-        				<label className='label'>{this.props.label}</label>
-                <input className='input-text' type="text" value={this.state.value} onChange={this.handleChange} ref={(c) => this._input = c}/>
-            </div>
+        			<label className='label'>{this.props.label}</label>
+                    <input className='input-text' type="text" value={this.state.value} onChange={this.handleChange} ref={(c) => this._input = c}/>
+                </div>
         )
     }
 });

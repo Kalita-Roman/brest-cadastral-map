@@ -8,6 +8,7 @@ import { ControlLayer } from './controls/controlLayer/controlLayer.js';
 import { getUser } from './auth/roles.js';
 
 import pubsub from './src/pubsub.js';
+import requests from './src/requests.js';
 
 let SetterStyle = function(opacity, _color) {
 	let _acceptor;
@@ -33,37 +34,14 @@ let SetterStyle = function(opacity, _color) {
 
 let role;
 
-let request = function(typeReq, url, body) {
-	return new Promise((resolve, reject) => {
-		let xhr = new XMLHttpRequest();
-		xhr.open(typeReq, url, true);
-		xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-		xhr.onload = function() {
-			if (200 <= this.status && this.status < 300) {
-				if(this.response === 'OK') return;
-				resolve(JSON.parse(this.response));
-		    } else {
-		        var error = new Error(this.statusText);
-		        error.code = this.status;
-		        reject(error);
-		    }
-		}
-		xhr.send(JSON.stringify(body));
-	});
-}
-
-let requestToDB = function(body) {
-	return request('POST', '/db', body)
-}
-
 let loadLayer = function(layer) {
 
 	let body = { 	
 		action: 'select', 
 		layer: layer.nameTable,
 	};
-	return requestToDB(body)
-		.then( x => {
+	return requests.requestToDB(body)
+		.then(x => {
 			var dates = x.map(y => new Date(y.editing_date));
 			var maxDate = Math.max.apply(Math, dates);
 			var minDate = Math.min.apply(Math, dates);
@@ -75,39 +53,31 @@ let loadLayer = function(layer) {
 			} ];
 
 			CityMap.setLayerFromDB(x, layer.setterStyle, layer.nameTable);
-		});
-
-
-	/*return new Promise((resolve, reject) => {
-		let body = { 	
-			action: 'select', 
-			layer: layer.nameTable,
-		};
-		requestToDB(body)
-			.then( x => {
-				var dates = x.map(y => new Date(y.editing_date));
-				var maxDate = Math.max.apply(Math, dates);
-				var minDate = Math.min.apply(Math, dates);
-
-				layer.filters = [ {
-					filterName: 'rangeDate',
-					start: new Date(minDate),
-					end: new Date(maxDate)
-				} ];
-
-				CityMap.setLayerFromDB(x, layer.setterStyle, layer.nameTable);
-				resolve();
-		});
-	});*/
+		})
 }
 
 const ControllerLayers = {
 	currentLayer: null,
 
 	layers:  [
-		{ name:'Слой №1', nameTable: 'layer_1', color: '#aaf', setterStyle: (() => new SetterStyle(0.7, '#aaf'))(), current: true },
-		{ name:'Слой №2', nameTable: 'layer_2', color: '#faf', setterStyle: (() => new SetterStyle(0.7, '#faf'))(), current: false },
-		{ name:'Слой №3', nameTable: 'layer_3', color: '#afa', setterStyle: (() => new SetterStyle(0.7, '#afa'))(), current: false }
+		{ 
+			name:'Слой №1', 
+			nameTable: 'layer_1', 
+			color: '#aaf', 
+			setterStyle: (() => new SetterStyle(0.7, '#aaf'))(),
+			form: 'getForm_1',
+			tables: [ 'type_build' ],
+			current: true 
+		},
+		{
+			name:'Слой №2',
+			nameTable: 'layer_2',
+			color: '#faf', 
+			setterStyle: (() => new SetterStyle(0.7, '#faf'))(),
+			form: 'getForm_2',
+			tables: [ 'type_project' ],
+			current: false 
+		}
 	],
 
 	setCheck(key) {
@@ -120,32 +90,44 @@ const ControllerLayers = {
 		Promise.all(this.layers.map(loadLayer))
 			.then(() => {
 				this.setCheck(0);
-			});
+			})
+			.catch(x => { alert('Не удалось соединиться с базой данных!'); console.log(x); });
 	},
 
 	showFilterForm(key) {
-		let layer = this.layers[key];
-		ModalForm.showForm(role, { layer: layer.name, filters: layer.filters }, 'fm_filter_1')
-			.then(filters => {
-				layer.filters = filters;
 
+		let currentLayer = this.layers[key];
+		let data = { layer: currentLayer };
+		let body = {
+			action: 'edit',
+			tables: currentLayer.tables
+		};
+		requests.request('POST', '/db', body)
+			.then(x => {
+				data.tables = x.t;
+				return ModalForm.showForm(role, data, 'fm_filter')
+			})
+			.then(filters => {
+				console.log(filters);
+				currentLayer.filters = filters;
 				let body = { 	
 					action: 'select', 
-					layer: layer.nameTable,
+					layer: currentLayer.nameTable,
 					filters: filters
 				};
 
-				requestToDB(body)
+				requests.requestToDB(body)
 					.then( x => {
-						CityMap.removeLayer(layer.nameTable);
-						CityMap.setLayerFromDB(x, layer.setterStyle, layer.nameTable);
+						CityMap.removeLayer(currentLayer.nameTable);
+						CityMap.setLayerFromDB(x, currentLayer.setterStyle, currentLayer.nameTable);
+						CityMap.setCurrentLayer(this.currentLayer.nameTable, x => loadLayer(this.currentLayer, x));
 					});
 
 			});
 	}
 }
 
-request('POST', '/user')
+requests.request('POST', '/user')
 	.then(x => setRole(getUser(x)));
 
 pubsub.subscribe('changeVisibleLayer', x => {  
@@ -177,27 +159,38 @@ let setRole = function(user) {
 };
 
 let listenMapInsert = function(e) {
-	console.log(e);
 	let inputedShape = e.shapeObj;
 	let res;
-	ModalForm.showForm(role, null, 'fm_input')
-	.then(x => { 
-		res = x.data;
-		let body = {
-			action: 'insert',
-			body: {
-				layer: ControllerLayers.currentLayer.nameTable,
-				geom: inputedShape.toGeoJSON(),
-				name: res.name,
-				editor: role.user.id
-			}
-		};
-		return request('POST', '/db', body);
-	})
-	.then(y => {
-		res.id = y.id;
-		e.setShapeInMap(inputedShape, res);
-	});
+	let currentLayer = ControllerLayers.currentLayer;
+	let data = { layer: ControllerLayers.currentLayer };
+	let body = {
+		action: 'edit',
+		tables: ControllerLayers.currentLayer.tables
+	};
+	requests.request('POST', '/db', body)
+		.then(x => {
+			data.tables = x.t;
+			return ModalForm.showForm(role, data, 'fm_input' )
+		})
+		.then(x => { 
+			res = x.data;
+			let body = {
+				action: 'insert',
+				body: {
+					layer: ControllerLayers.currentLayer.nameTable,
+					geom: inputedShape.toGeoJSON(),
+					editor: role.user.id,
+					name: res.name,
+					tables: ControllerLayers.currentLayer.tables.map(x => { return { table: x, value: res[x] } } )
+				}
+			};
+			console.log(body);
+			return requests.request('POST', '/db', body);
+		})
+		.then(y => {
+			res.id = y.id;
+			e.setShapeInMap(inputedShape, res);
+		});
 };
 
 let createBody = function(name, layers,  convert) {
@@ -216,7 +209,7 @@ let listenMapUpdate = function(layers) {
 		editor: role.user.id
 	} }
 	
-	requestToDB(createBody('update', layers, convert));
+	requests.requestToDB(createBody('update', layers, convert));
 };
 
 let listenMapDelete = function (layers) {
@@ -225,26 +218,28 @@ let listenMapDelete = function (layers) {
 		id: x.idObj,
 	} }
 
-	requestToDB(createBody('delete', layers, convert))
+	requests.requestToDB(createBody('delete', layers, convert))
 		.then(x => {
 			layers.forEach(CityMap.removeShape);
 		});
 };
 
 let listenEdit = function(e) {
+	let editedRecord;
+	let currentLayer = ControllerLayers.layers.find(l => l.nameTable === e.layer);
+	let data = { layer: currentLayer };
 	let body = {
 		action: 'edit',
 		body: {
 			layer: e.layer,
 			id: e.id
-		}
+		},
+		tables: currentLayer.tables
 	};
-	let editedRecord;
-	request('POST', '/db', body)
+	requests.request('POST', '/db', body)
 		.then(x => {
-			let data = {
-				name: x[0].name
-			};
+			data.record = x.record;
+			data.tables = x.t;
 			return ModalForm.showForm(role, data, 'fm_input');
 		})
 		.then(x => { 
@@ -254,11 +249,12 @@ let listenEdit = function(e) {
 				body: {
 					layer: e.layer,
 					id: e.id,
+					editor: role.user.id,
 					name: editedRecord.name,
-					editor: role.user.id
+					tables: currentLayer.tables.map(x => { return { table: x, value: editedRecord[x] } } )
 				}
 			};
-			return request('POST', '/db', body)
+			return requests.request('POST', '/db', body);
 		})
 		.then(x => {
 			e.cb(editedRecord)
