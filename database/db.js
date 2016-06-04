@@ -31,11 +31,11 @@ var filter = function(filters) {
     var fils = [];
 
     var f = filters.find(x =>  x.filterName === 'rangeDate');
-    var getDate = function (strDate) {
+    /*var getDate = function (strDate) {
         return new Date(strDate.slice(0, 10))
     }
     if(f.start) fils.push(x => getDate(f.start) <= getDate(x.editing_date.toISOString()));
-    if(f.end) fils.push(x => getDate(f.end) >=  getDate(x.editing_date.toISOString()));
+    if(f.end) fils.push(x => getDate(f.end) >=  getDate(x.editing_date.toISOString()));*/
 
 
     addTable(fils, filters, 'type_build');
