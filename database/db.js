@@ -1,25 +1,23 @@
 var pgp = require("pg-promise")();
 
-
+/*
 var connection = {
     	host: 'localhost',
     	port: 5432,
-//    	database: 'cd',
 		database: 'brestdb',
     	user: 'postgres',
- //   	password: 'pass'
     	password: 'root'
 	};
-
-/*
-var connection = {
-        host: 'ec2-23-23-162-78.compute-1.amazonaws.com',
-        port: 5432,
-        database: 'd88b2fmsbmie2q',
-        user: 'dpnsnduzfqpghf',
-        password: 'w-_JN76Y5kDzH28N29fINxWLN_'
-    };
 */
+
+var connection = {
+        host: 'ec2-54-243-204-195.compute-1.amazonaws.com',
+        port: 5432,
+        database: 'degu98g3me9l74',
+        user: 'iqujckjxjswxii',
+        password: '_DSzPBjQ3VAVk_gZTGP7lgogir'
+    };
+
 
 var db = pgp(connection);
 
@@ -33,8 +31,11 @@ var filter = function(filters) {
     var fils = [];
 
     var f = filters.find(x =>  x.filterName === 'rangeDate');
-    if(f.start) fils.push(x => new Date(f.start) <= new Date(x.editing_date));
-    if(f.end) fils.push(x => new Date(f.end) >=  new Date(x.editing_date));
+    var getDate = function (strDate) {
+        return new Date(strDate.slice(0, 10))
+    }
+    if(f.start) fils.push(x => getDate(f.start) <= getDate(x.editing_date.toISOString()));
+    if(f.end) fils.push(x => getDate(f.end) >=  getDate(x.editing_date.toISOString()));
 
 
     addTable(fils, filters, 'type_build');
@@ -64,12 +65,18 @@ var handler = {
     select: function(req, res) {
         db.any("SELECT * FROM $1~", [req.body.layer])
             .then(function (data) {
+                console.log();
+                data.forEach(x => console.log(x.id));
+                console.log();
                 if(req.body.filters) {
-                    res.send(filter(req.body.filters)(data));
+                    var f = filter(req.body.filters)(data);
+                    f.forEach(x => console.log(x.id));
+                    res.send(f);
                 }
                 else {
                     res.send(data);
                 }
+                console.log();
             })
             .catch(function (error) {
                 res.send(error);
