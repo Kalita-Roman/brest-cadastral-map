@@ -1,4 +1,7 @@
+'use strict'
+
 var pgp = require("pg-promise")();
+require("./polyfill.js");
 
 /*
 var connection = {
@@ -66,16 +69,11 @@ var handler = {
         db.any("SELECT * FROM $1~", [req.body.layer])
             .then(function (data) {
                 if(req.body.filters) {
-                    //var f = filter(req.body.filters)(data);
-                    //f.forEach(x => console.log(x.id));
-                    var f = data;//.filters()
-                    var t = [5, 3];
-                    res.send({ main: f, tech: t });
+                    res.send(filter(req.body.filters)(data));
                 }
                 else {
                     res.send(data);
                 }
-                console.log();
             })
             .catch(function (error) {
                 res.send('error');
