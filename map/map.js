@@ -147,8 +147,6 @@ let InterfaceMap = {
         let layerEntity = new LayerEntity(nameLayer, newLayerUsed, setterStyle);
         layersOnMap.set( nameLayer, layerEntity );
 
-        console.log(records);
-
         records.forEach(record => {
             let shapeObj = L.polygon(convertGeom(record.geom), common_options_layer );
             layerEntity.addShape(shapeObj, record);

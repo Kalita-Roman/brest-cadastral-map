@@ -118,7 +118,7 @@ const ControllerLayers = {
 				requests.requestToDB(body)
 					.then( x => {
 						console.log(x);
-						let result = x;//.main;
+						let result = x.result;
 						CityMap.removeLayer(currentLayer.nameTable);
 						CityMap.setLayerFromDB(result, currentLayer.setterStyle, currentLayer.nameTable);
 						CityMap.setCurrentLayer(this.currentLayer.nameTable, result => loadLayer(this.currentLayer, result));

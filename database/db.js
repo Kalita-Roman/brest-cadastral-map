@@ -20,6 +20,7 @@ var connection = {
         user: 'iqujckjxjswxii',
         password: '_DSzPBjQ3VAVk_gZTGP7lgogir'
     };
+  
 
 
 var db = pgp(connection);
@@ -33,13 +34,14 @@ var addTable = function(fils,  filters, nameTable) {
 var filter = function(filters) {
     var fils = [];
 
-    /*var f = filters.find(x =>  x.filterName === 'rangeDate');
-    var getDate = function (strDate) {
-        return new Date(strDate.slice(0, 10))
-    }
-    if(f.start) fils.push(x => getDate(f.start) <= getDate(x.editing_date.toISOString()));
-    if(f.end) fils.push(x => getDate(f.end) >=  getDate(x.editing_date.toISOString()));*/
+    var f = filters.find(x =>  x.filterName === 'rangeDate');
 
+    var dateStart = new Date(f.start);
+    var dateEnd = new Date(f.end);
+    dateEnd.setDate(dateEnd.getDate() + 1);
+
+    if(f.start) fils.push(x => dateStart <= x.editing_date);
+    if(f.end) fils.push(x => dateEnd >= x.editing_date);
 
     addTable(fils, filters, 'type_build');
     addTable(fils, filters, 'type_project');
@@ -69,7 +71,9 @@ var handler = {
         db.any("SELECT * FROM $1~", [req.body.layer])
             .then(function (data) {
                 if(req.body.filters) {
-                    res.send(filter(req.body.filters)(data));
+                    var result = filter(req.body.filters)(data);
+                    var addition = {};
+                    res.send({ result: result, addition: addition });
                 }
                 else {
                     res.send(data);

@@ -15,7 +15,7 @@ module.exports = {
         modulesDirectories: ['node_modules']
     },
 
-    //watch: NODE_ENV === 'development',
+    watch: NODE_ENV === 'development',
 
     devtool: NODE_ENV === 'development' ? 'cheap-inline-module-source-map' : null, 
 
