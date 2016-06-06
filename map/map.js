@@ -142,11 +142,12 @@ let InterfaceMap = {
         let convertGeom = function(geom) {
             return JSON.parse(geom).geometry.coordinates[0].map(x => [x[1], x[0]]);
         }
-
         let newLayerUsed = new L.featureGroup().addTo(map);
 
         let layerEntity = new LayerEntity(nameLayer, newLayerUsed, setterStyle);
         layersOnMap.set( nameLayer, layerEntity );
+
+        console.log(records);
 
         records.forEach(record => {
             let shapeObj = L.polygon(convertGeom(record.geom), common_options_layer );

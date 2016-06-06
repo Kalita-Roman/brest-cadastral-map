@@ -30,8 +30,8 @@ var addTable = function(fils,  filters, nameTable) {
 var filter = function(filters) {
     var fils = [];
 
-    var f = filters.find(x =>  x.filterName === 'rangeDate');
-    /*var getDate = function (strDate) {
+    /*var f = filters.find(x =>  x.filterName === 'rangeDate');
+    var getDate = function (strDate) {
         return new Date(strDate.slice(0, 10))
     }
     if(f.start) fils.push(x => getDate(f.start) <= getDate(x.editing_date.toISOString()));
@@ -65,13 +65,12 @@ var handler = {
     select: function(req, res) {
         db.any("SELECT * FROM $1~", [req.body.layer])
             .then(function (data) {
-                console.log();
-                data.forEach(x => console.log(x.id));
-                console.log();
                 if(req.body.filters) {
-                    var f = filter(req.body.filters)(data);
-                    f.forEach(x => console.log(x.id));
-                    res.send(f);
+                    //var f = filter(req.body.filters)(data);
+                    //f.forEach(x => console.log(x.id));
+                    var f = data;//.filters()
+                    var t = [5, 3];
+                    res.send({ main: f, tech: t });
                 }
                 else {
                     res.send(data);
@@ -79,7 +78,7 @@ var handler = {
                 console.log();
             })
             .catch(function (error) {
-                res.send(error);
+                res.send('error');
             });
     },
 

@@ -2,7 +2,6 @@ import CityMap from './map/map.js';
 import ModalForm from './modalform/modalform.js';
 import React from 'react';
 import ReactDom from 'react-dom';
-//import Calendar from 'react-input-calendar';
 
 import { ControlLayer } from './controls/controlLayer/controlLayer.js';
 import { getUser } from './auth/roles.js';
@@ -118,9 +117,11 @@ const ControllerLayers = {
 
 				requests.requestToDB(body)
 					.then( x => {
+						console.log(x);
+						let result = x.main;
 						CityMap.removeLayer(currentLayer.nameTable);
-						CityMap.setLayerFromDB(x, currentLayer.setterStyle, currentLayer.nameTable);
-						CityMap.setCurrentLayer(this.currentLayer.nameTable, x => loadLayer(this.currentLayer, x));
+						CityMap.setLayerFromDB(result, currentLayer.setterStyle, currentLayer.nameTable);
+						CityMap.setCurrentLayer(this.currentLayer.nameTable, result => loadLayer(this.currentLayer, result));
 					});
 
 			});

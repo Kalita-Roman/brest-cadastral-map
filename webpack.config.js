@@ -1,4 +1,8 @@
+
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+const NODE_ENV = process.env.NODE_ENV || 'development';
+const webpack = require('webpack');
+
 
 module.exports = {
     entry: __dirname + "/main.js",
@@ -11,9 +15,9 @@ module.exports = {
         modulesDirectories: ['node_modules']
     },
 
-    //watch: true,
+    //watch: NODE_ENV === 'development',
 
-    devtool: "cheap-inline-module-source-map", 
+    devtool: NODE_ENV === 'development' ? 'cheap-inline-module-source-map' : null, 
 
     module: {
     	loaders: [
@@ -33,6 +37,7 @@ module.exports = {
     },
 
     plugins: [
-        new ExtractTextPlugin('bundle.css')
+        new ExtractTextPlugin('bundle.css'),
+        new webpack.DefinePlugin({ NODE_ENV: JSON.stringify(NODE_ENV) })
     ]
 }
