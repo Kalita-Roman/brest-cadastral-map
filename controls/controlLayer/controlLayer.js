@@ -57,10 +57,10 @@ let ControlLayer = React.createClass({
 	render() { 
 		return (
 		<div className="controlLayer">
+			<h2>{this.props.layer.name}</h2>
 			<div style={{backgroundColor: this.props.layer.color}} className='box-color'>
 				<input type='checkbox' checked={this.state.show} onChange={this.handlerСheckbox} />
 			</div>
-			<h3>{this.props.layer.name}</h3>
 			{this.switchCurrenting}
 			<input type='range' min="0" max="1" step="0.05" value={this.state.opacity} onChange={this.handlerRange} />
 			<button onClick={this.showFormFileters} >фильтры</button>

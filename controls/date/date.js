@@ -34,7 +34,8 @@ module.exports = React.createClass({
 
 	render: function() {
 		return (
-			<div className='inline'>
+			<div className='inliner'>
+				<p className='label'>{this.props.label}</p>
 				<Calendar 
 					format='DD/MM/YYYY' 
 					date={this.props.date}

@@ -51,19 +51,15 @@
 
 .form-input h1 {
 	width: 100%;
+	margin-bottom: 20px;
 	text-align: center;
 	font-size: 20px;
 	font-weight: bold;
 }
 
-.form-input h2 {
-	font-size: 18px;
-	font-weight: bold;
-}
-
 .form-content {
 	width: 100%;
-	padding: 10px;
+	padding: 20px;
 }
 
 .buttomsbar {
@@ -94,18 +90,43 @@
 	display: block;	
 	font-size: 14px;
 }
-.date-box {
+.formInput .label {
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.formInput .label {
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.formInput .labelComboBox {
+	margin-right: 20px;
+}
+
+.formInput select {
+	width: 100%;
+}.date-box {
 	width: 100px;
 	height: 20px;
 	border: 1px solid #777;
 }
 
-.inline {
+.filterDate .inliner {
 	display: inline-block;
 }
 
-.inline:not(:last-child) {
-	margin-right: 20px;
+.filterDate .inliner:not(:last-child) {
+	margin-right:  20px;
+}
+
+.filterDate .inliner .label{
+	margin-right: 5px;
+}
+
+.filterDate .inliner > * {
+	vertical-align: middle;
+	display: inline-block;
 }.input-calendar {
   font-family: 'Pontano Sans', sans-serif;
   position: relative;
@@ -265,9 +286,25 @@
   font-size: 20px;
   color: #F39C12;
 }
-.controlLayer {
+.checkbox input {
+	margin-right: 10px;
+}
+
+.checkbox .inliner {
+	display: inline-block;
+}
+
+.checkbox .inliner * {
+	vertical-align: middle;
+}.filterItem {
+	margin-bottom: 15px;
+}
+
+.filterHearder {
+	font-size: 20px;
+	font-weight: bold;
+}.controlLayer {
 	width: 100%;
-	/*height: 50px;*/
 	float: left;
 	padding: 5px;
 	background-color: #fff;
@@ -285,8 +322,13 @@
 	width: 30px;
 	height: 30px;
 	float: left;
+	margin-right: 10px;
 	border-radius: 5px;
 	border: 1px solid #333;
+}
+
+.controlLayer .button-led-round {
+	float: left;
 }
 
 .controlLayer input[type='checkbox'] {
@@ -295,9 +337,11 @@
 	margin-top: -2px;
 }
 
-.controlLayer h3 {
+.controlLayer h2 {
+	width: 100%;
 	float: left;
-	margin-left: 10px;
+	margin: 10px 0;
+	font-size: 14px;
 }
 
 .controlLayer input[type='range'] {
@@ -310,7 +354,6 @@
 	float: left;
 }
 .button-led-round {
-	float: right;
 	width: 32px;
 	height: 32px;
 	padding: 4px;
@@ -336,4 +379,4 @@
 .button-led-body.button-off {
 	background: radial-gradient(circle at 33% 33%, #fff 4%, #ccc 17%, #bbb 33%, #555 83%);
 }
-/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYnVuZGxlLmNzcyIsInNvdXJjZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OzsiLCJzb3VyY2VSb290IjoiIn0=*/
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYnVuZGxlLmNzcyIsInNvdXJjZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Iiwic291cmNlUm9vdCI6IiJ9*/

@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import FormInput from './forminput.js'
-import FormFilter from './formFilter.js'
+import FormInput from './../formInput/formInput.js'
+import FormFilter from './../formFilter/formFilter.js'
 
 import './modalform.css';
 

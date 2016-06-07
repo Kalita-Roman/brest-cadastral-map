@@ -1,0 +1,11 @@
+.checkbox input {
+	margin-right: 10px;
+}
+
+.checkbox .inliner {
+	display: inline-block;
+}
+
+.checkbox .inliner * {
+	vertical-align: middle;
+}

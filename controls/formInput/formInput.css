@@ -1,0 +1,17 @@
+.formInput .label {
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.formInput .label {
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.formInput .labelComboBox {
+	margin-right: 20px;
+}
+
+.formInput select {
+	width: 100%;
+}

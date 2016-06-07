@@ -1,5 +1,5 @@
 import CityMap from './map/map.js';
-import ModalForm from './modalform/modalform.js';
+import ModalForm from './controls/modalform/modalform.js';
 import React from 'react';
 import ReactDom from 'react-dom';
 
@@ -60,7 +60,7 @@ const ControllerLayers = {
 
 	layers:  [
 		{ 
-			name:'Слой №1', 
+			name:'Строящиеся здания и сооружения', 
 			nameTable: 'layer_1', 
 			color: '#aaf', 
 			setterStyle: (() => new SetterStyle(0.7, '#aaf'))(),
@@ -69,7 +69,7 @@ const ControllerLayers = {
 			current: true 
 		},
 		{
-			name:'Слой №2',
+			name:'Строительные проекты',
 			nameTable: 'layer_2',
 			color: '#faf', 
 			setterStyle: (() => new SetterStyle(0.7, '#faf'))(),
@@ -107,7 +107,6 @@ const ControllerLayers = {
 				return ModalForm.showForm(role, data, 'fm_filter')
 			})
 			.then(filters => {
-				console.log(filters);
 				currentLayer.filters = filters;
 				let body = { 	
 					action: 'select', 
@@ -117,7 +116,6 @@ const ControllerLayers = {
 
 				requests.requestToDB(body)
 					.then( x => {
-						console.log(x);
 						let result = x.result;
 						CityMap.removeLayer(currentLayer.nameTable);
 						CityMap.setLayerFromDB(result, currentLayer.setterStyle, currentLayer.nameTable);
@@ -185,7 +183,6 @@ let listenMapInsert = function(e) {
 					tables: ControllerLayers.currentLayer.tables.map(x => { return { table: x, value: res[x] } } )
 				}
 			};
-			console.log(body);
 			return requests.request('POST', '/db', body);
 		})
 		.then(y => {

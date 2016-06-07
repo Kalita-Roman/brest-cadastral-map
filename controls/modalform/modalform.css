@@ -31,19 +31,15 @@
 
 .form-input h1 {
 	width: 100%;
+	margin-bottom: 20px;
 	text-align: center;
 	font-size: 20px;
 	font-weight: bold;
 }
 
-.form-input h2 {
-	font-size: 18px;
-	font-weight: bold;
-}
-
 .form-content {
 	width: 100%;
-	padding: 10px;
+	padding: 20px;
 }
 
 .buttomsbar {

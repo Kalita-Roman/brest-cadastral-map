@@ -32,9 +32,12 @@ module.exports = React.createClass({
 			);
 
 		return (
-			<select value={this.state.value} onChange={this.handlChange}>
-				{options}
-			</select>
+			<div>
+				<label className='label labelComboBox'>{this.props.label}</label>
+				<select value={this.state.value} onChange={this.handlChange}>
+					{options}
+				</select>
+			</div>
 		)
 	}
 });

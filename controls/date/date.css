@@ -1,0 +1,22 @@
+.date-box {
+	width: 100px;
+	height: 20px;
+	border: 1px solid #777;
+}
+
+.filterDate .inliner {
+	display: inline-block;
+}
+
+.filterDate .inliner:not(:last-child) {
+	margin-right:  20px;
+}
+
+.filterDate .inliner .label{
+	margin-right: 5px;
+}
+
+.filterDate .inliner > * {
+	vertical-align: middle;
+	display: inline-block;
+}
