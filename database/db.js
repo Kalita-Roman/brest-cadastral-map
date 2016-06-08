@@ -86,13 +86,13 @@ var handler = {
 
     insert: function(req, res) {
     	req.body.body.editingDate = new Date();
-
+        var body = req.body.body;
     	var rec = {}
         rec.editingDate = new Date();
-        rec.editor = req.body.body.editor;
-        rec.layer = req.body.body.layer;
-        rec.geom = req.body.body.geom,
-        rec.name = req.body.body.name;
+        rec.editor = body.editor;
+        rec.layer = body.layer;
+        rec.geom = body.geom,
+        rec.name = body.name;
         req.body.body.tables.forEach(x => rec[x.table] = x.value);
 
         var q1 = '';
@@ -151,15 +151,16 @@ var handler = {
     },
 
     updateChanges: function(req, res) {
+        var body = req.body.body;
         var rec = {}
         rec.editingDate = new Date();
-        rec.editor = req.body.body.editor;
-        rec.layer = req.body.body.layer;
-        rec.name = req.body.body.name;
-        rec.id = req.body.body.id;
-        rec = req.body.body.tables.reduce((prev, cur) => { rec[cur.table] = cur.value ; return rec } , rec);
+        rec.editor = body.editor;
+        rec.layer = body.layer;
+        rec.name = body.name;
+        rec.id = body.id;
+        rec = body.tables.reduce((prev, cur) => { rec[cur.table] = cur.value ; return rec } , rec);
 
-        var q = req.body.body.tables.map(x => ', ' + x.table + '=${' + x.table + '}');
+        var q = body.tables.map(x => ', ' + x.table + '=${' + x.table + '}');
 
         var qy = "UPDATE ${layer~} SET name=${name}, editor=${editor}, editing_date=${editingDate}" + q.join('') + " WHERE id=${id}";
 
