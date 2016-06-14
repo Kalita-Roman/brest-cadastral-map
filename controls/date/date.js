@@ -22,6 +22,13 @@ let WrapperText = function(data, cb) {
 module.exports = React.createClass({
 
 	componentWillMount() {
+		if(this.props.data) {
+			this.text = {
+				date : this.props.data.get().toLocaleString().slice(0, 10)
+			};
+			return;
+		}
+
 		this.text = {
 			date : this.props.date.toLocaleString().slice(0, 10)
 		}
@@ -29,6 +36,10 @@ module.exports = React.createClass({
 
   	onChange(e) {
   		var date = new Date(e);
+  		if(this.props.data) {
+  			this.props.data.set(date);
+  			return;
+  		}
   		this.props.accept(date);
   	},
 
@@ -38,7 +49,7 @@ module.exports = React.createClass({
 				<p className='label'>{this.props.label}</p>
 				<Calendar 
 					format='DD/MM/YYYY' 
-					date={this.props.date}
+					date={this.props.data.get()}
 					onChange={this.onChange}
 					hideOnBlur={true} 
 					inputName='name_1'

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 
 import FormInput from './../formInput/formInput.js'
 import FormFilter from './../formFilter/formFilter.js'
+import FormEditors from './../formEditors/formEditors.js'
 
 import './modalform.css';
 
@@ -30,7 +31,9 @@ let FormBox = React.createClass({
 
 		return (<div>
 			<Shadow />
-			{this.state.form}
+			<div className='form-input'>
+				{this.state.form}
+			</div>
 		</div>)
 	}
 });
@@ -40,17 +43,18 @@ ReactDOM.render(
     document.getElementById('modalform')
 );
 
-let f1 = function(handlActions, data, user) {
-	return <FormInput handleClick={handlActions} data={data} user={user} />;
-}
-
-let f2 = function(handlActions, data, user) {
-	return <FormFilter handleClick={handlActions} data={data} user={user} />;
-}
-
 const forms = {
-	'fm_input':f1, 
-	'fm_filter':f2
+	fm_input(handlActions, data, user) {
+		return <FormInput handleClick={handlActions} data={data} user={user} />;
+	}, 
+
+	fm_filter(handlActions, data, user) {
+		return <FormFilter handleClick={handlActions} data={data} user={user} />;
+	},
+
+	fm_editors(handlActions, data, user) {
+		return <FormEditors handleClick={handlActions} data={data} user={user} />;
+	}
 }
 
 module.exports.showForm = function(user, data, typeform) {

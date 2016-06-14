@@ -10,14 +10,37 @@ module.exports = React.createClass({
 
     handleChange: function(event) {
         if(!this.props.enable) return;
-        this.setState({value: event.target.value});
-        this.props.text.set(event.target.value);
+        let value = event.target.value;
+        this.setState({value: value});
+        this.props.text.set(value);
+        this.props.validator.set(value);
     },
+
 
     getDefaultProps: function() {
         return {
-            enable: true
+            enable: true,
+            validator: {
+                    set() {},
+                    subscribe() {}
+                }
         };
+    },
+
+    componentWillMount() {
+        this.props.validator.set(this.props.text.get());
+        this.props.validator.subscribe(this.setNoValid);
+    },
+
+    setNoValid(e) {
+        console.log(e);
+        this.handlFocus = x => {
+            this.handlFocus = null;
+            this.setState({ classLabel: '' });
+            this.messageError = null;
+        }
+        this.messageError = (<p className='err'>{e.message}</p>);
+        this.setState({ classLabel: 'err' });
     },
 
     componentDidMount(){
@@ -29,7 +52,15 @@ module.exports = React.createClass({
     		return (
       			<div className='input-box' >
         			<label className='label'>{this.props.label}</label>
-                    <input className='input-text' type="text" value={this.state.value} onChange={this.handleChange} ref={(c) => this._input = c}/>
+                    <input 
+                        className={this.state.classLabel} 
+                        type="text" 
+                        value={this.state.value} 
+                        onChange={this.handleChange} 
+                        onFocus={this.handlFocus}
+                        ref={(c) => this._input = c}
+                        />
+                    {this.messageError}
                 </div>
         )
     }

@@ -73,7 +73,7 @@ module.exports = React.createClass({
 
 	render: function() {
 
-		return (<div className='form-input'>
+		return (<div>
 					<div className='form-content'>
 						<h1>Фильтр для: {this.props.data.layer.name}</h1>	
 						<div>

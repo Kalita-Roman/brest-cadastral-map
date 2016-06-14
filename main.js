@@ -4,7 +4,8 @@ import React from 'react';
 import ReactDom from 'react-dom';
 
 import { ControlLayer } from './controls/controlLayer/controlLayer.js';
-import { getUser } from './auth/roles.js';
+import UserLabel from './controls/userLabel/userLabel.js';
+import getRole from './auth/roles.js';
 
 import pubsub from './src/pubsub.js';
 import requests from './src/requests.js';
@@ -60,22 +61,22 @@ const ControllerLayers = {
 
 	layers:  [
 		{ 
-			name:'Строящиеся здания и сооружения', 
-			nameTable: 'layer_1', 
-			color: '#aaf', 
-			setterStyle: (() => new SetterStyle(0.7, '#aaf'))(),
-			form: 'getForm_1',
-			tables: [ 'type_build' ],
+			name:'Проектируемые объекты (АПЗ)', 
+			nameTable: 'apz', 
+			color: '#afa', 
+			setterStyle: (() => new SetterStyle(0.7, '#afa'))(),
+			form: 'getForm_apz',
+			tables: [ 'func_zone' ],
 			current: true 
 		},
-		{
-			name:'Строительные проекты',
-			nameTable: 'layer_2',
-			color: '#faf', 
-			setterStyle: (() => new SetterStyle(0.7, '#faf'))(),
-			form: 'getForm_2',
-			tables: [ 'type_project' ],
-			current: false 
+		{ 
+			name:'Градопаспорта', 
+			nameTable: 'citypassport', 
+			color: '#aaf', 
+			setterStyle: (() => new SetterStyle(0.7, '#aaf'))(),
+			form: 'getForm_citypassport',
+			tables: [ ],
+			current: false
 		}
 	],
 
@@ -94,7 +95,6 @@ const ControllerLayers = {
 	},
 
 	showFilterForm(key) {
-
 		let currentLayer = this.layers[key];
 		let data = { layer: currentLayer };
 		let body = {
@@ -127,7 +127,7 @@ const ControllerLayers = {
 }
 
 requests.request('POST', '/user')
-	.then(x => setRole(getUser(x)));
+	.then(x => setRole(getRole(x)) );
 
 pubsub.subscribe('changeVisibleLayer', x => {  
 	let layer = ControllerLayers.layers[x.key];
@@ -136,28 +136,52 @@ pubsub.subscribe('changeVisibleLayer', x => {
 	else
 		loadLayer(layer);
 });
+
 pubsub.subscribe('showFormFilter', ControllerLayers.showFilterForm.bind(ControllerLayers));
+
 
 ControllerLayers.loadLayers();
 
-let setRole = function(user) {
-	role = user;
-	CityMap.setRole(user);
+let showEditors = function() {
+	let body = {
+		action: 'showeditors'
+	}
+	requests.request('POST', '/db', body)
+		.then(x => {
+			return ModalForm.showForm(role, x, 'fm_editors');
+		})
+		.then(x => {
+			if(x === 'close') return;
+			console.log(x);
+			requests.request('POST', '/db', x)
+				.then(y => showEditors());
 
-	pubsub.subscribe('dblClick_controlsLayer', x => ControllerLayers.setCheck(x));
+		});
+}
+
+let setRole = function(_role) {
+	role = _role;
+	CityMap.setRole(role);
+
+	pubsub.subscribe('setCurrentLayer', x => ControllerLayers.setCheck(x));
 	let controlsLayer =  ControllerLayers.layers.map((layer, i) => 
-		<ControlLayer key={i} layer={layer} idKey={i} user={user} pubsub={pubsub}/>
+		<ControlLayer key={i} layer={layer} idKey={i} user={role} pubsub={pubsub}/>
 	);
+
+	pubsub.subscribe('showEditors', showEditors);
+	let userLabel = role.user ? <UserLabel role={role} pubsub={pubsub}/> : null;
 	
 	ReactDom.render(
 		<div>
+			{ userLabel }
 			{ controlsLayer }
 	  	</div>,
 	  	document.getElementById('toolbar-right')
 	);
 };
 
-let listenMapInsert = function(e) {
+
+let insertToMap = function(e) {
 	let inputedShape = e.shapeObj;
 	let res;
 	let currentLayer = ControllerLayers.currentLayer;
@@ -168,7 +192,8 @@ let listenMapInsert = function(e) {
 	};
 	requests.request('POST', '/db', body)
 		.then(x => {
-			data.tables = x.t;
+			console.log(x);
+			data.refTables = x.refTables;
 			return ModalForm.showForm(role, data, 'fm_input' )
 		})
 		.then(x => { 
@@ -179,10 +204,10 @@ let listenMapInsert = function(e) {
 					layer: ControllerLayers.currentLayer.nameTable,
 					geom: inputedShape.toGeoJSON(),
 					editor: role.user.id,
-					name: res.name,
-					tables: ControllerLayers.currentLayer.tables.map(x => { return { table: x, value: res[x] } } )
+					fields: res,
 				}
 			};
+			console.log(body);
 			return requests.request('POST', '/db', body);
 		})
 		.then(y => {
@@ -222,7 +247,7 @@ let listenMapDelete = function (layers) {
 		});
 };
 
-let listenEdit = function(e) {
+let editObject = function(e) {
 	let editedRecord;
 	let currentLayer = ControllerLayers.layers.find(l => l.nameTable === e.layer);
 	let data = { layer: currentLayer };
@@ -237,7 +262,7 @@ let listenEdit = function(e) {
 	requests.request('POST', '/db', body)
 		.then(x => {
 			data.record = x.record;
-			data.tables = x.t;
+			data.refTables = x.refTables;
 			return ModalForm.showForm(role, data, 'fm_input');
 		})
 		.then(x => { 
@@ -248,8 +273,7 @@ let listenEdit = function(e) {
 					layer: e.layer,
 					id: e.id,
 					editor: role.user.id,
-					name: editedRecord.name,
-					tables: currentLayer.tables.map(x => { return { table: x, value: editedRecord[x] } } )
+					fields: editedRecord,
 				}
 			};
 			return requests.request('POST', '/db', body);
@@ -260,8 +284,8 @@ let listenEdit = function(e) {
 }
 
 const actions = [
-	['input', listenMapInsert],
+	['input', insertToMap],
 	['update', listenMapUpdate],
 	['delete', listenMapDelete],
-	['edit', listenEdit]
+	['edit', editObject],
 ].forEach(x => CityMap.setListener(x[0], x[1]));

@@ -5,3 +5,12 @@
 .input-box input {
 	width: 100%;
 }
+
+.input-box input.err {
+	box-shadow: 0 0 5px rgba(255,0,0,1);
+}
+
+.input-box p.err {
+	font-size: 10px;
+	color: #f00;
+}

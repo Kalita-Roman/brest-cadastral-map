@@ -1,29 +1,8 @@
 'use strict'
 
-var pgp = require("pg-promise")();
+var db = require('./connectionPostgreSQL.js');
+
 require("./polyfill.js");
-
-/*
-var connection = {
-    	host: 'localhost',
-    	port: 5432,
-		database: 'brestdb',
-    	user: 'postgres',
-    	password: 'root'
-	};
-*/
-
-var connection = {
-        host: 'ec2-54-243-204-195.compute-1.amazonaws.com',
-        port: 5432,
-        database: 'degu98g3me9l74',
-        user: 'iqujckjxjswxii',
-        password: '_DSzPBjQ3VAVk_gZTGP7lgogir'
-    };
-
-
-
-var db = pgp(connection);
 
 var addTable = function(fils,  filters, nameTable) {
     var f = filters.find(x =>  x.filterName === nameTable);
@@ -85,25 +64,29 @@ var handler = {
     },
 
     insert: function(req, res) {
-    	req.body.body.editingDate = new Date();
         var body = req.body.body;
     	var rec = {}
-        rec.editingDate = new Date();
+        rec.editing_date = new Date();
         rec.editor = body.editor;
         rec.layer = body.layer;
-        rec.geom = body.geom,
-        rec.name = body.name;
-        req.body.body.tables.forEach(x => rec[x.table] = x.value);
+        rec.geom = body.geom;
 
         var q1 = '';
         var q2 = '';
-        var q = req.body.body.tables.forEach(x => { q1 += (', '+x.table), q2 += (', ${' + x.table + '}')});
 
-		db.one("INSERT INTO ${layer~}(geom, name, editor, editing_date" + q1 +") VALUES(${geom}, ${name}, ${editor}, ${editingDate}" + q2 +") returning id", rec)
+        for(var field in  body.fields) {
+            rec[field] = body.fields[field]
+            q1 += (', '+ field);
+            q2 += (', ${' + field + '}');
+        }
+
+        db.one("INSERT INTO ${layer~}(geom, editor, editing_date" + q1 +") VALUES(${geom}, ${editor}, ${editing_date}" + q2 +") returning id", rec)
             .then(function (data) {
+                console.log(data);
                 res.status(201).send(data);
             })
             .catch(function (error) {
+                console.log(error);
                 res.send(error);
             });
     },
@@ -121,48 +104,56 @@ var handler = {
     edit: function(req, res) {
       
         var prec = new Promise((resolve, reject) => {
-        	if(!req.body.body)
-        		resolve({});
-        	db.one("SELECT * FROM ${layer~} WHERE id=${id}", req.body.body)
-	        	.then(data => {
+            if(!req.body.body)
+                resolve({});
+            db.one("SELECT * FROM ${layer~} WHERE id=${id}", req.body.body)
+                .then(data => {
 					resolve({ name:'record', value:data });
 				});
         });
 
+        var arrayToObj = function(arr, transform) {
+            if(!transform) transform = x => x;
+            return arr.reduce((prev, cur) => { 
+                if(cur.name) prev[cur.name] = transform(cur.value);
+                return prev 
+            }, {});
+        }
+
 	    var ptab = new Promise((resolve, reject) => {
 	    	
-	    var getTable = (name, t) => t.any("SELECT * FROM $1~", name)
-                .then(data => ({name, data}));
+	       var getTable = (name, _db) => _db.any("SELECT * FROM $1~", name)
+                .then(value => ({name, value}));
 
             db.task(t => t.batch(req.body.tables.map(x => getTable(x, t))))
             	.then(data => {
-            		resolve({ name:'t', value: data });
+            		resolve({ name:'refTables', value: arrayToObj(data) });
             	});
 	    });
+
 	    Promise.all([prec, ptab])
 	    	.then( data => {
-	    		var result = data.reduce((prev, cur) => {
-	    			if(cur.name)
-	    				prev[cur.name] = cur.value; 
-	    			return prev;
-	    		} ,{});
+                var result = arrayToObj(data);
 	    		res.send(result);
 	    	});
     },
 
     updateChanges: function(req, res) {
         var body = req.body.body;
+      
         var rec = {}
-        rec.editingDate = new Date();
-        rec.editor = body.editor;
         rec.layer = body.layer;
-        rec.name = body.name;
+        rec.editor = body.editor;
+        rec.editing_date = new Date();
         rec.id = body.id;
-        rec = body.tables.reduce((prev, cur) => { rec[cur.table] = cur.value ; return rec } , rec);
 
-        var q = body.tables.map(x => ', ' + x.table + '=${' + x.table + '}');
-
-        var qy = "UPDATE ${layer~} SET name=${name}, editor=${editor}, editing_date=${editingDate}" + q.join('') + " WHERE id=${id}";
+        var q = '';
+        for(var field in  body.fields) {
+            rec[field] = body.fields[field]
+            q += (', ' + field + '=${' + field + '}');
+        }
+      
+        var qy = "UPDATE ${layer~} SET editor=${editor}, editing_date=${editing_date}" + q + " WHERE id=${id}";
 
         db.query(qy, rec)
             .then(function (data) {
@@ -173,6 +164,51 @@ var handler = {
                 res.send(error);
             });
     },
+
+
+
+    showeditors(req, res) {
+        var body = req.body.body;
+
+        db.any("SELECT * FROM users")
+            .then(function (data) {
+                res.send(data);
+            })
+            .catch(function (error) {
+                res.send('error');
+            });
+    },
+
+    editorInsert(req, res) {
+        db.one("INSERT INTO users(name, post, username, password, role) VALUES(${name}, ${post}, ${username}, ${password}, 'editor') returning id", req.body.user)
+            .then(function (id) {
+                res.status(201).send(id);
+            })
+            .catch(function (error) {
+                res.send(error);
+            });
+    },
+
+    editorDelete(req, res) {
+        db.one("DELETE FROM users WHERE id=${id}", req.body.user)
+            .then(function (data) {
+                res.status(200).send('OK');
+            })
+            .catch(function (error) {
+                res.send(error);
+            });
+    },
+
+    editorUpdate(req, res) {
+      
+        db.one("UPDATE users SET name=${name}, post=${post}, username=${username}, password=${username} WHERE id=${id}", req.body.user)
+            .then(function (data) {
+                res.status(200).send('OK');
+            })
+            .catch(function (error) {
+                res.send(error);
+            });
+    }
 }
 
 

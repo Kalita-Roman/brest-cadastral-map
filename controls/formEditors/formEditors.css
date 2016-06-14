@@ -1,0 +1,64 @@
+.table {
+	height: 500px;
+    overflow-y: scroll;
+    float: left;
+}
+
+.row {
+	width: 100%;
+	margin: 1px 0;
+	float: left;
+}
+
+.head {
+	height: 20px;
+	font-weight: bold;
+}
+
+.row .indent {
+	width: 100%;
+	float: left;
+	height: 0px;
+	padding-right: 120px;
+}
+
+.row .cols {
+	width: 100%;
+	float: left;
+}
+
+.row .col{
+	float: left;
+	padding: 0 5px;
+	text-align: center;
+}
+
+.row .col.row-login {
+	width: 25%;
+}
+
+.row .col.row-name {
+	width: 50%;
+}
+
+.row .col.row-post {
+	width: 25%;
+}
+
+.row .fixedwidth {
+	width: 120px;	
+	float: right;
+	padding: 0 5px;
+}
+
+.row .btn {
+	width: 100%;
+	border: none;
+	background-color: inherit;
+	border: 1px solid #999;
+	border-radius: 5px;
+}
+
+.row .btn:hover {
+	background-color: #ddd;
+}

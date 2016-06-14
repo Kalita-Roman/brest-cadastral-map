@@ -39,7 +39,7 @@ let ControlLayer = React.createClass({
 	},
 
 	handlerSwitchCurrent() {
-		this.props.pubsub.publish('dblClick_controlsLayer', this.props.idKey);
+		this.props.pubsub.publish('setCurrentLayer', this.props.idKey);
 	},
 
 	showFormFileters(e) {

@@ -2,19 +2,12 @@ import React from 'react';
 import Button from './../button/button.js';
 import FieldText from './../fieldText/fieldText.js';
 import ComboBox from './../comboBox/comboBox.js';
+import DateBox from './../date/date.js';
+import Textarea from './../textarea/textarea.js';
+import WrapperData from './../src/wrapperData.js';
 
 import './../modalform/modalform.css';
 import './formInput.css';
-
-let WrapperData = function(data, name) {
-	this.set = function(value) {
-		data[name] = value;
-	}
-
-	this.get = function() {
-		return data[name];
-	}
-}
 
 let getButtomsVisitor = function() {
 	return (
@@ -35,14 +28,7 @@ let getButtomsEditor = function() {
 
 module.exports = React.createClass({
 	componentWillMount() {
-		this.record = this.props.data.record 
-			? this.props.data.record 
-			: {
-				name: '',
-				customer: '',
-				date: ''
-			};
-	
+		this.record = {};
 		this.validations = [];
 		this.props.user.setСontroll(this);
   	},
@@ -86,24 +72,20 @@ module.exports = React.createClass({
 
 	getFieldName()  { 
 		return <div className="name">
-			<FieldText label='Название объекта' text={new WrapperData(this.record, 'name')} focus={true} enable={this.enable}/>
+			<FieldText label='Название объекта' text={new WrapperData(this.record, 'name', '')} focus={true} enable={this.enable}/>
 		</div> 
 	},
 
-	createComboBox(name, table) {
-		let items = this.props.data.tables
-			.find(x => x.name === table).data
+	createComboBox(name, wrapperData) {
+		console.log(this.props.data);
+		let items = this.props.data.refTables[wrapperData.name]
 			.map(x => { return { value: x.id, label: x.name } });
-		if(this.record[table] === '0'){
+		
+		if(!wrapperData.get())
 			items.splice(0,0, { value: 0, label: '' } );
-		}
-
-		let handlChange = function(e) {
-			this.record[table] = e.target.value;
-		}
 
 		return (
-			<ComboBox label={name} value={this.record[table]} options={items} onChange={e => this.record[table] = e.target.value} />
+			<ComboBox label={name} value={wrapperData.get()} options={items} onChange={e => wrapperData.set(e.target.value)} />
 		)
 	},
 
@@ -119,33 +101,40 @@ module.exports = React.createClass({
 		this.validations.push(item);
 	},
 
+	createWrapper(name, defualt) {
+		return new WrapperData(this.record, this.props.record, name, defualt);
+	},
 
 	setDefault(name, value) {
 		if(!this.record[name])
 			this.record[name] = value;
 	},
 
-	getForm_1() {
-		this.createValidation('type_build', x => x !== '0', () => alert('Не указан вид строительства'));
-		this.setDefault('type_build', '0');
+	getForm_apz() {
 		return (<div className='form-content'>
-					{this.getFieldName()}
-					{this.createComboBox('Вид строительства', 'type_build')}
+					<FieldText label='Название объекта' text={this.createWrapper('name', '')} enable={this.enable} focus={true} />
+					<FieldText label='Адрес объекта' text={this.createWrapper('adress', '')} enable={this.enable}/>
+					<DateBox label='Дата выдачи АПЗ' data={this.createWrapper('date_out_apz',new Date())} />
+					<DateBox label='Дата решения исполкома' data={this.createWrapper('date_solution',new Date())} />
+					{this.createComboBox('Функциональная зона', this.createWrapper('func_zone', false))}
+					<FieldText label='Номер регистрационной записи' text={this.createWrapper('num_reg_rec', '')} enable={this.enable}/>
+					<Textarea label='Заметка' text={this.createWrapper('note', '')} />
 				</div>);
 	},
 
-	getForm_2() {
-		this.createValidation('type_project', x => x !== '0', () => alert('Не указан тип проекта'));
-		this.setDefault('type_project', '0');
+	getForm_citypassport() {
 		return (<div className='form-content'>
-					{this.getFieldName()}
-					{this.createComboBox('Тип проекта', 'type_project')}
+					<FieldText label='Название' text={this.createWrapper('name', '')} enable={this.enable} focus={true} />
+					<FieldText label='Адрес объекта' text={this.createWrapper('adress', '')} enable={this.enable}/>
+					<DateBox label='Дата регистрации' data={this.createWrapper('date_reg', new Date())} />
+					<FieldText label='Площадь участка, м2' text={this.createWrapper('area', '')} enable={this.enable} />
+					<Textarea label='Заметка' text={this.createWrapper('note', '')} />
 				</div>);
 	},
 
 	render: function() {
 		let getFrom = this[this.props.data.layer.form];
-		return (<div className='form-input formInput'>
+		return (<div className='formInput'>
 					{getFrom()}
 					{this.getButtoms()}
 				</div>)

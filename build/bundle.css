@@ -6,106 +6,29 @@
 	width: 100px;
 	color: #333;
 }.form-button {
-	width: 70px;
+	min-width: 100px;
 	line-height: 30px;
+	padding: 0 5px;
 	border: 1px solid #333;
 	border-radius: 5px;
 	cursor: pointer;
 	background-color: inherit;
+
 }.input-box label {
 	margin-bottom: 3px;
 }
 
 .input-box input {
 	width: 100%;
-}#modalform {
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: 0;
-	height: 0;
 }
 
-.form-shadow {
-	position: absolute;
-	z-index: 1000;
-	width: 100vw;
-	height: 100vh;
-	left: 0;
-	top: 0;
-	background-color: gray;
-	opacity: 0.5;
+.input-box input.err {
+	box-shadow: 0 0 5px rgba(255,0,0,1);
 }
 
-.form-input {
-	position: absolute;
-	z-index: 1001;
-	width: 768px;
-	left: 50vw;
-	top: 50vh;
-	transform: translate(-50%, -50%);
-	border-radius: 5px;
-	box-shadow: 0 0 25px #333;
-	background-color: #fff;
-}
-
-.form-input h1 {
-	width: 100%;
-	margin-bottom: 20px;
-	text-align: center;
-	font-size: 20px;
-	font-weight: bold;
-}
-
-.form-content {
-	width: 100%;
-	padding: 20px;
-}
-
-.buttomsbar {
-	width: 100%;
-	padding: 10px;
-	text-align: right;
-	
-}
-
-.form-button:not(:first-child) {
-	margin-left: 10px; 
-}
-
-.input-box {
-	margin-bottom: 20px;
-}
-
-.inline {
-	display: inline-block;
-}
-
-.input-box .label {
-	display: block;
-}
-
-.input-box .input-text {
-	line-height: 16px;
-	display: block;	
-	font-size: 14px;
-}
-.formInput .label {
-	font-size: 18px;
-	font-weight: bold;
-}
-
-.formInput .label {
-	font-size: 18px;
-	font-weight: bold;
-}
-
-.formInput .labelComboBox {
-	margin-right: 20px;
-}
-
-.formInput select {
-	width: 100%;
+.input-box p.err {
+	font-size: 10px;
+	color: #f00;
 }.date-box {
 	width: 100px;
 	height: 20px;
@@ -286,7 +209,83 @@
   font-size: 20px;
   color: #F39C12;
 }
-.checkbox input {
+.textarea {
+	width: 100%;
+	max-width: 100%;
+	height: 100px;
+}#modalform {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 0;
+	height: 0;
+}
+
+.form-shadow {
+	position: absolute;
+	z-index: 1000;
+	width: 100vw;
+	height: 100vh;
+	left: 0;
+	top: 0;
+	background-color: gray;
+	opacity: 0.5;
+}
+
+.form-input {
+	position: absolute;
+	z-index: 1001;
+	width: 768px;
+	max-height: 96vh;
+	left: 50vw;
+	top: 50vh;
+	transform: translate(-50%, -50%);
+	border-radius: 5px;
+	box-shadow: 0 0 25px #333;
+	background-color: #fcfcfc;
+	color: #000;
+	font-family: 'Tahoma','Arial';
+	font-size: 12px;
+	font-weight: normal;
+}
+
+.form-content {
+	width: 100%;
+	padding: 20px;
+	float: left;
+}
+
+.buttomsbar {
+	width: 100%;
+	padding: 10px;
+	float: left;
+	text-align: right;
+}
+
+.form-button:not(:first-child) {
+	margin-left: 10px; 
+}
+
+.input-box {
+	margin-bottom: 20px;
+}
+
+.inline {
+	display: inline-block;
+}
+.formInput .label {
+	font-size: 12px;
+	font-family: 'Tahoma';
+	font-weight: normal;
+}
+
+.formInput .labelComboBox {
+	margin-right: 20px;
+}
+
+.formInput select {
+	width: 100%;
+}.checkbox input {
 	margin-right: 10px;
 }
 
@@ -303,6 +302,69 @@
 .filterHearder {
 	font-size: 20px;
 	font-weight: bold;
+}.table {
+	height: 500px;
+    overflow-y: scroll;
+    float: left;
+}
+
+.row {
+	width: 100%;
+	margin: 1px 0;
+	float: left;
+}
+
+.head {
+	height: 20px;
+	font-weight: bold;
+}
+
+.row .indent {
+	width: 100%;
+	float: left;
+	height: 0px;
+	padding-right: 120px;
+}
+
+.row .cols {
+	width: 100%;
+	float: left;
+}
+
+.row .col{
+	float: left;
+	padding: 0 5px;
+	text-align: center;
+}
+
+.row .col.row-login {
+	width: 25%;
+}
+
+.row .col.row-name {
+	width: 50%;
+}
+
+.row .col.row-post {
+	width: 25%;
+}
+
+.row .fixedwidth {
+	width: 120px;	
+	float: right;
+	padding: 0 5px;
+}
+
+.row .btn {
+	width: 100%;
+	border: none;
+	background-color: inherit;
+	border: 1px solid #999;
+	border-radius: 5px;
+}
+
+.row .btn:hover {
+	background-color: #ddd;
 }.controlLayer {
 	width: 100%;
 	float: left;
@@ -378,5 +440,52 @@
 
 .button-led-body.button-off {
 	background: radial-gradient(circle at 33% 33%, #fff 4%, #ccc 17%, #bbb 33%, #555 83%);
+}.userLabel {
+	width: 100%;
+	padding: 10px;
+	background-color: #fff;
+	border-bottom: 2px solid #aaa;
 }
-/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYnVuZGxlLmNzcyIsInNvdXJjZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Iiwic291cmNlUm9vdCI6IiJ9*/
+
+.userHead {
+	font-size: 12px;
+	font-weight: normal;
+	color: #555;
+	margin-bottom: 5px;
+
+}
+
+.userName {
+	font-size: 14px;
+	font-weight: bold;
+	color: #000;
+	margin-bottom: 5px;
+}
+
+.userPost {
+	font-size: 12px;
+	color: #000;
+	margin-bottom: 5px;
+}
+
+.userExit {
+	display: block;
+	width: 70px;
+	line-height: 16px;
+	font-size: 10px;
+	text-transform: uppercase;
+	text-align: center;
+	border: 1px solid #999;
+	border-radius: 5px;
+}
+
+.userExit:hover {
+	background-color: #ddd;
+}
+
+.userExit, .userExit:hover {
+	text-decoration: none;
+	color: inherit;
+	cursor: pointer;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYnVuZGxlLmNzcyIsInNvdXJjZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OyIsInNvdXJjZVJvb3QiOiIifQ==*/

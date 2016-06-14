@@ -1,8 +1,10 @@
 .form-button {
-	width: 70px;
+	min-width: 100px;
 	line-height: 30px;
+	padding: 0 5px;
 	border: 1px solid #333;
 	border-radius: 5px;
 	cursor: pointer;
 	background-color: inherit;
+
 }

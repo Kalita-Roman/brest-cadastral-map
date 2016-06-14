@@ -1,6 +1,6 @@
-module.exports.getUser = function(responce) {
+module.exports = function(responce) {
 	if(!responce || responce === 'false') return userVisitor;
-	var result = table[responce.type];
+	var result = table[responce.role];
 	result.user = responce;
 	return result;
 }
@@ -29,9 +29,27 @@ const userEditor = {
 	}
 }
 
+const userAdmin = {
+	name: 'admin',
+
+	setMap(map) {
+		map.addControls();
+	},
+
+	setСontroll(controll) {
+		if(controll.setAdmin) {
+			controll.setAdmin();
+			return;
+		}
+		if(controll.setEditor)
+			controll.setEditor();
+	}
+}
+
 const table = {
 	editor: userEditor,
-	visitor: userVisitor
+	visitor: userVisitor,
+	admin: userAdmin
 }
 
 
