@@ -94,6 +94,9 @@ var handler = {
     update: function(req, res) {
     	var dateNow = new Date();
     	req.body.body.forEach(x => x.editingDate = dateNow);
+
+    
+
         delupt(req, res, "UPDATE ${layer~} SET geom=${geom}, editor=${editor}, editing_date=${editingDate} WHERE id=${id}");
     },
 
@@ -147,11 +150,19 @@ var handler = {
         rec.editing_date = new Date();
         rec.id = body.id;
 
+
+
         var q = '';
         for(var field in  body.fields) {
             rec[field] = body.fields[field]
             q += (', ' + field + '=${' + field + '}');
         }
+
+        console.log();
+        console.log();
+        console.log(rec);
+        console.log();
+        console.log();
       
         var qy = "UPDATE ${layer~} SET editor=${editor}, editing_date=${editing_date}" + q + " WHERE id=${id}";
 
@@ -201,7 +212,7 @@ var handler = {
 
     editorUpdate(req, res) {
       
-        db.one("UPDATE users SET name=${name}, post=${post}, username=${username}, password=${username} WHERE id=${id}", req.body.user)
+        db.one("UPDATE users SET name=${name}, post=${post}, username=${username}, password=${password} WHERE id=${id}", req.body.user)
             .then(function (data) {
                 res.status(200).send('OK');
             })

@@ -4,22 +4,12 @@ import FieldText from './../fieldText/fieldText.js';
 import './date.css';
 import './../../node_modules/react-input-calendar/style/index.css'
 
-let WrapperText = function(data, cb) {
-	this.set = function(value) {
-		let res = value.match(/\d{4}-\d{2}-\d{2}/);
-		if(res){
-			let dt = new Date(res[0]);
-			cb(dt);
+module.exports.DateField = React.createClass({
+	getDefaultProps() {
+		return {
+			enable: false
 		}
-		data.date = value;
-	};
-
-	this.get = function() {
-		return data.date;
-	}
-}
-
-module.exports = React.createClass({
+	},
 
 	componentWillMount() {
 		if(this.props.data) {
@@ -36,6 +26,7 @@ module.exports = React.createClass({
 
   	onChange(e) {
   		var date = new Date(e);
+  		console.log(date);
   		if(this.props.data) {
   			this.props.data.set(date);
   			return;
@@ -45,16 +36,34 @@ module.exports = React.createClass({
 
 	render: function() {
 		return (
-			<div className='inliner'>
-				<p className='label'>{this.props.label}</p>
+			<div className='calendar'>
 				<Calendar 
 					format='DD/MM/YYYY' 
 					date={this.props.data.get()}
 					onChange={this.onChange}
 					hideOnBlur={true} 
 					inputName='name_1'
+					disabled={!this.props.enable}
 					/>
 			</div>
 		)
 	}
+});
+
+module.exports.DateFieldLabel = React.createClass({
+	render: function() {
+		return (
+			<div className='inliner'>
+				<p className='label'>{this.props.label}</p>
+				<module.exports.DateField data={this.props.data}/>
+			</div>
+		)
+	}
+		/*<Calendar 
+					format='DD/MM/YYYY' 
+					date={this.props.data.get()}
+					onChange={this.onChange}
+					hideOnBlur={true} 
+					inputName='name_1'
+					/>*/
 });

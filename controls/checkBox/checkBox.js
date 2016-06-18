@@ -8,6 +8,12 @@ module.exports = React.createClass({
 		}
 	},
 
+	getDefaultProps() {
+		return {
+			checked: false
+		}
+	},
+
 	handlerСheckbox(e) {
 		e.stopPropagation();
 		this.setState( { checked: e.target.checked } );

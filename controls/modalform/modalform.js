@@ -31,8 +31,12 @@ let FormBox = React.createClass({
 
 		return (<div>
 			<Shadow />
-			<div className='form-input'>
-				{this.state.form}
+			<div className='form-box-t'>
+				<div className='form-box-c'>
+					<div className='form-body'>
+						{this.state.form}
+					</div>
+				</div>
 			</div>
 		</div>)
 	}

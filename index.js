@@ -28,9 +28,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
+app.get('/test', function (req, res) {
+    res.sendFile('testcontrol.html', { root: __dirname } , (e) => { if(e) console.log(e); });
+});
+
 app.get('/', function (req, res) {
   	res.sendFile('index.html', { root: __dirname } , (e) => { if(e) console.log(e); });
-    //res.send('Работает');
 });
 
 app.get('/login',

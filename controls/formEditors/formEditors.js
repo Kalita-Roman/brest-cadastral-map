@@ -4,6 +4,7 @@ import FieldText from './../fieldText/fieldText.js';
 import ComboBox from './../comboBox/comboBox.js';
 import CheckBox from './../checkBox/checkBox.js';
 import WrapperData from './../src/wrapperData.js'
+import { Validator, ConditionsKit, fillField } from './../src/validator.js';
 import './../modalform/modalform.css';
 import './formEditors.css';
 
@@ -40,49 +41,9 @@ let Table = React.createClass({
 	}
 });
 
-let Validator = function() {
 
-	let fields = [];
 
-	this.check = function(onIsValid, onIsNotValid) {
-		let result = fields.map(x => x.check()).every(x => x);
-		if(result) 
-			onIsValid();
-		else
-			onIsNotValid();
-	};
 
-	this.get = function(f) {
-		var newVal = new Val(f);
-		fields.push(newVal);
-		return newVal;
-	}
-}
-
-let Val = function(f) {
-	let _value;
-	let _acceptMessage = () => { };
-
-	this.set = function(value) {
-		_value = value;
-	}
-
-	this.subscribe = function(acceptMessage) {
-		_acceptMessage = acceptMessage;
-	}
-
-	this.check = function() {
-		var result = f.check(_value);
-		if(!result)
-			_acceptMessage({message: f.message});
-		return result;
-	}
-}
-
-let fillField = {
-	check(value) { return value !== '' },
-	message: 'Заполните поле.'
-}
 
 module.exports = React.createClass({
 
@@ -164,7 +125,8 @@ module.exports = React.createClass({
 			return new WrapperData(newRec, this.state.currentUser, name, '');
 		};
 
-		//const users = this.props.data.map(x => x.username);
+		
+
 		let check = function(value) { 
 				let u = this.props.data.find(x => x.username === value);
 				if(!u) return true;
@@ -176,11 +138,13 @@ module.exports = React.createClass({
 			message: 'Такой пользователь уже существует.'
 		};
 
+		let ch = new ConditionsKit(fillField, checkUserName);
+
 		return (<div>
 					<div className='form-content'>
 						<FieldText label='ФИО' text={createWrapper.bind(this)('name')} validator={this.validator.get(fillField)} focus={true} />
 						<FieldText label='Должность' text={createWrapper.bind(this)('post')} validator={this.validator.get(fillField)} />
-						<FieldText label='Пользователь' text={createWrapper.bind(this)( 'username')} validator={this.validator.get(checkUserName)} />
+						<FieldText label='Пользователь' text={createWrapper.bind(this)( 'username')} validator={this.validator.get(ch)} />
 						<FieldText label='Пароль' text={createWrapper.bind(this)('password')} validator={this.validator.get(fillField)} />
 					</div>
 					{buttons}
@@ -207,8 +171,6 @@ module.exports = React.createClass({
 	},
 
 	render: function() {
-		
-		console.log(this.state);
 		return this[this.state.form]();
 	}
 });

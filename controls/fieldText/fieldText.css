@@ -1,16 +1,29 @@
-.input-box label {
-	margin-bottom: 3px;
+.input-box-text .input-text {
+	padding: 3px;
 }
 
-.input-box input {
-	width: 100%;
-}
-
-.input-box input.err {
+.input-box-text .input-text.err {
 	box-shadow: 0 0 5px rgba(255,0,0,1);
 }
 
-.input-box p.err {
+.input-box-text p.err {
 	font-size: 10px;
 	color: #f00;
+}
+
+.fieldtext-width .input-text {
+	width: 100%;
+}
+
+.fieldtext-width .input-label {
+	display: block;
+	margin-bottom: 3px;
+}
+
+.fieldtext-line .input-label {
+	margin-right: 5px;	
+}
+
+.fieldtext-line .input-text {
+	width: 200px;	
 }

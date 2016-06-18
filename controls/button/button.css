@@ -6,5 +6,8 @@
 	border-radius: 5px;
 	cursor: pointer;
 	background-color: inherit;
+}
 
+.form-button:hover {
+	background-color: #fff;
 }

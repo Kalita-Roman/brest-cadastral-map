@@ -67,7 +67,7 @@ const ControllerLayers = {
 			setterStyle: (() => new SetterStyle(0.7, '#afa'))(),
 			form: 'getForm_apz',
 			tables: [ 'func_zone' ],
-			current: true 
+			current: false
 		},
 		{ 
 			name:'Градопаспорта', 
@@ -76,7 +76,7 @@ const ControllerLayers = {
 			setterStyle: (() => new SetterStyle(0.7, '#aaf'))(),
 			form: 'getForm_citypassport',
 			tables: [ ],
-			current: false
+			current: true
 		}
 	],
 
@@ -89,7 +89,7 @@ const ControllerLayers = {
 	loadLayers() {
 		Promise.all(this.layers.map(loadLayer))
 			.then(() => {
-				this.setCheck(0);
+				this.setCheck(1);
 			})
 			.catch(x => { alert('Не удалось соединиться с базой данных!'); console.log(x); });
 	},

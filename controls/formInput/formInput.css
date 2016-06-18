@@ -1,13 +1,16 @@
-.formInput .label {
-	font-size: 12px;
-	font-family: 'Tahoma';
-	font-weight: normal;
+.label {
+	margin-bottom: 3px;
 }
 
-.formInput .labelComboBox {
-	margin-right: 20px;
+.indent {
+	margin-bottom: 10px;
 }
 
-.formInput select {
-	width: 100%;
+.solution_gik .input-box-text,
+.solution_gik .calendar{
+	display: inline-block;
+}
+
+.solution_gik .input-box-text {
+	margin-right: 15px;
 }
