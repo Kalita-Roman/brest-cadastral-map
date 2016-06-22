@@ -1,69 +1,62 @@
 import React from 'react';
-import Calendar from 'react-input-calendar';
+//import Calendar from 'react-input-calendar';
+import DatePicker from 'react-datepicker';
 import FieldText from './../fieldText/fieldText.js';
+import moment from 'moment';
 import './date.css';
 import './../../node_modules/react-input-calendar/style/index.css'
 
+import 'react-datepicker/dist/react-datepicker.css'
+
 module.exports.DateField = React.createClass({
-	getDefaultProps() {
-		return {
-			enable: false
-		}
-	},
-
-	componentWillMount() {
-		if(this.props.data) {
-			this.text = {
-				date : this.props.data.get().toLocaleString().slice(0, 10)
-			};
-			return;
-		}
-
-		this.text = {
-			date : this.props.date.toLocaleString().slice(0, 10)
-		}
+	getInitialState: function() {
+	    return {
+	    	enable: false,
+	    };
   	},
 
-  	onChange(e) {
-  		var date = new Date(e);
-  		console.log(date);
-  		if(this.props.data) {
+  	getDefaultProps() {
+  		return {
+            show: true
+        }
+  	},
+ 
+	handleChange: function(date) {
+  		var date = new Date(date);
+  		if(this.props.data) 
   			this.props.data.set(date);
-  			return;
-  		}
-  		this.props.accept(date);
-  	},
 
+		this.setState({
+			startDate: date
+		});
+	},
+ 
 	render: function() {
-		return (
-			<div className='calendar'>
-				<Calendar 
-					format='DD/MM/YYYY' 
-					date={this.props.data.get()}
-					onChange={this.onChange}
-					hideOnBlur={true} 
-					inputName='name_1'
-					disabled={!this.props.enable}
-					/>
-			</div>
-		)
+		let props = {};
+
+		let date = this.props.data.get();
+		if(date)
+			props.selected = moment(date);
+
+		return <DatePicker
+			dateFormat="DD/MM/YYYY"
+			placeholderText='Дата'
+		    disabled={!this.props.enable}
+		    onChange={this.handleChange} 
+		    locale='ru-ru'
+		    {...props}
+		/>;
 	}
 });
 
 module.exports.DateFieldLabel = React.createClass({
 	render: function() {
 		return (
-			<div className='inliner'>
+			<div className=''>
 				<p className='label'>{this.props.label}</p>
-				<module.exports.DateField data={this.props.data}/>
+				<module.exports.DateField data={this.props.data} enable={this.props.enable} />
+				<p className='last_editor'>{this.props.editor}</p>
 			</div>
 		)
 	}
-		/*<Calendar 
-					format='DD/MM/YYYY' 
-					date={this.props.data.get()}
-					onChange={this.onChange}
-					hideOnBlur={true} 
-					inputName='name_1'
-					/>*/
 });

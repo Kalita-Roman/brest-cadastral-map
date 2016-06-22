@@ -5,8 +5,9 @@ import ComboBox from './../comboBox/comboBox.js';
 import CheckBox from './../checkBox/checkBox.js';
 import { DateFieldLabel, DateField } from './../date/date.js';
 import Textarea from './../textarea/textarea.js';
+import FieldSolution from './../fieldSolution/fieldSolution.js';
 import WrapperData from './../src/wrapperData.js';
-import { Validator, ConditionsKit, fillField } from './../src/validator.js';
+import { Validator, ConditionsKit, fillField, selectField } from './../src/validator.js';
 
 import './../modalform/modalform.css';
 import './formInput.css';
@@ -71,15 +72,28 @@ module.exports = React.createClass({
 		</div> 
 	},
 
-	createComboBox(name, wrapperData) {
-		let items = this.props.data.refTables[wrapperData.name]
+	createComboBox(label, nameField) {
+		let wrapperData = this.createWrapper(nameField, false);
+
+		let items = this.props.data.refTables[nameField]
 			.map(x => { return { value: x.id, label: x.name } });
 		
 		if(!wrapperData.get())
 			items.splice(0,0, { value: 0, label: '' } );
 
+		console.log(wrapperData.get());
+
 		return (
-			<ComboBox label={name} value={wrapperData.get()} options={items} onChange={e => wrapperData.set(e.target.value)} />
+			<ComboBox 
+				//className={'margin-bottom'}
+				label={label} 
+				value={wrapperData.get()} 
+				options={items} 
+				validator={this.validator.get(selectField)}
+				onChange={e => wrapperData.set(e.target.value)}
+				editor={this.getEditor(nameField)}
+				enable={this.enable}
+			/>
 		)
 	},
 
@@ -92,92 +106,114 @@ module.exports = React.createClass({
 			this.record[name] = value;
 	},
 
+	createField(className, label, nameField, flags) {
+		let arrFlags = flags ? Array.from(flags) : flags=[];
+		return (<FieldText 
+			className={className + ' margin-bottom'}
+			label={label}
+			text={this.createWrapper(nameField, '')}
+			validator={this.validator.get(fillField)}
+			enable={this.enable}
+			focus={arrFlags.includes('focus')}
+			numeric={arrFlags.includes('numeric')} 
+			editor={this.getEditor(nameField)}
+			/>);
+	},
+
+	createFieldSolution(label, nameField, names, className) {
+		let nameEditor = '';
+			if(this.props.data.record) {
+				let editor = this.props.data.record.editors[nameField + '_num']||this.props.data.record.editors[nameField + '_date'];
+				nameEditor = this.getNameEditor(editor);
+			}
+		return (<FieldSolution 
+			recordNew = {this.record} 
+			recordOld = {this.props.data.record} 
+			className={className + ' margin-bottom'}
+			label={label}
+			nameField={nameField}
+			editor={nameEditor}
+			enable={this.enable}
+			type={names}/>)
+	},
+
+	createFieldSolution_s(label, nameField) {
+		const names = {type: 'getType_1', date: '_date', note: '_note'};
+		return this.createFieldSolution(label, nameField, names, 'solution');
+	},
+
+	createFieldSolution_gik(label, nameField) {
+		const names = {type: 'getType_2', date: '_date', note: '_num'};
+		return this.createFieldSolution(label, nameField, names, 'solutiongik');
+	},
+
+	createDate(label, nameField) {
+		return (
+				<DateFieldLabel 
+					label={label}
+					data={new WrapperData(this.record, this.props.data.record, nameField, null)} 
+					enable={this.enable}
+					editor={this.getEditor(nameField)}
+					show={true}
+				/>
+				);
+	},
+
+	createDateRange(label, partName) {
+		return (<div className='range_dates'>
+			<p className='label'>{label}</p>
+			<div className='dates'>
+				{this.createDate('Начало', 'date_start_'+partName)}
+				{this.createDate('Окончание', 'date_end_'+partName)}
+			</div>
+		</div>);
+	},
+
 	getForm_apz() {
-		return (<div className='form-content'>
-					<FieldText label='Название объекта' text={this.createWrapper('name', '')} enable={this.enable} focus={true} />
-					<FieldText label='Адрес объекта' text={this.createWrapper('adress', '')} enable={this.enable}/>
-					<DateFieldLabel label='Дата выдачи АПЗ' data={this.createWrapper('date_out_apz',new Date())} />
-					<DateFieldLabel label='Дата решения исполкома' data={this.createWrapper('date_solution',new Date())} />
-					{this.createComboBox('Функциональная зона', this.createWrapper('func_zone', false))}
-					<FieldText label='Номер регистрационной записи' text={this.createWrapper('num_reg_rec', '')} enable={this.enable}/>
-					<Textarea label='Заметка' text={this.createWrapper('note', '')} />
+		return (<div className='content-input'>
+					{this.createField('fieldtext-width', 'Наименование объекта', 'name', ['focus'])}
+					{this.createField('fieldtext-width', 'Адрес объекта', 'adress')}
+					{this.createField('fieldtext-width', 'Заказчик', 'customer')}
+					{this.createComboBox('Вид строительства', 'kind_building')}
+					{this.createFieldSolution_s('Архитектурно-планировочное задание', 'task')}
+					{this.createFieldSolution_s('Согласование гл. архитектора города', 'architect')}
+					{this.createFieldSolution_s('Экспертиза проекта', 'expertise')}
+					{this.createFieldSolution_s('Решение Госстройнадзора', 'gosstroynadzor')}
+					{this.createFieldSolution_s('Регистрация в реестре', 'registry')}
+					{this.createDateRange('Сроки строительства проектные', 'proj')}
+					{this.createDateRange('Сроки строительства фактические', 'fact')}
 				</div>);
 	},
 
+	getNameEditor(editor) {
+		return editor ? editor.name + ' ' + (new Date(editor.date)).toLocaleDateString() : '';
+	},
+
+	getEditor(nameField) {
+		let flag = this.props.data.record && this.props.data.record.editors[nameField];
+		return flag ? this.getNameEditor(this.props.data.record.editors[nameField]) : '';
+	},
+
 	getForm_citypassport() {
-		let createField = function(className, label, nameField, focus) {
-			return (<FieldText 
-				className={className + ' indent'}
-				label={label}
-				text={this.createWrapper(nameField, '')}
-				validator={this.validator.get(fillField)}
-				enable={this.enable}
-				focus={focus} />);
-		}
+		const names = {type: 'getType_2', date: '_date', note: '_num'}
 
-		let createFieldSolGIK = function(label, fieldName) {
-			return (<SolutionGIK recordNew = {this.record} recordOld = {this.props.data.record} label={label} fieldName={fieldName} />);
-		}
-
-		return (<div className='form-content'>
-					{createField.bind(this)('fieldtext-width', 'Наименование объекта', 'name', true)}
-					{createField.bind(this)('fieldtext-width', 'Адрес объекта', 'adress')}
-					<FieldText className='fieldtext-line indent' label='Площадь участка, Га' text={this.createWrapper('area', '')} validator={this.validator.get(fillField)} enable={this.enable} numeric={true} />
-					{createField.bind(this)('fieldtext-width', 'Победитель аукциона', 'winnerauction')}
-					{createFieldSolGIK.bind(this)('Решение ГИК на разработку градопаспорта','solgik_develpass')}
-					{createFieldSolGIK.bind(this)('Решение ГИК об утверждении градопаспорта','solgik_statepass')}
-					<Textarea label='Заметка' text={this.createWrapper('note', '')} />
+		return (<div className='content-input'>
+					{this.createField('fieldtext-width', 'Наименование объекта', 'name', ['focus'])}
+					{this.createField('fieldtext-width', 'Адрес объекта', 'adress')}
+					{this.createField('fieldtext-line', 'Площадь участка, Га', 'area', ['numeric'])}
+					{this.createField('fieldtext-width', 'Победитель аукциона', 'winnerauction')}
+					{this.createFieldSolution_gik('Решение ГИК на разработку градопаспорта','solgik_develpass')}
+					{this.createFieldSolution_gik('Решение ГИК об утверждении градопаспорта','solgik_statepass')}
+					<Textarea label='Заметка' text={this.createWrapper('note', '')} enable={this.enable} editor={this.getEditor('note')} />
 				</div>);
 	},
 
 	render: function() {
 		let getFrom = this[this.props.data.layer.form];
-		return (<div className='formInput'>
+		return (<div className='form-content'>
+					<h1 className='name_form'>{this.props.data.layer.name}</h1>
 					{getFrom()}
 					{this.getButtoms()}
 				</div>)
-	}
-});
-
-let SolutionGIK = React.createClass({
-	getInitialState() {
-		let getValue = x => this.props.recordOld[this.props.fieldName + x];
-		let checked = getValue('_num') && getValue('_date');
-
-		return {
-			checked: checked,
-			acceptor: this.setChecked(checked)
-		}
-	},
-
-	setChecked(check) {
-		if(check) return this.props.recordNew;
-		this.setNull();
-		return {};
-	},
-
-	setNull() {
-		let setValue = (name) => {
-			this.props.recordNew[this.props.fieldName + name] = null;
-		}
-		setValue('_num');
-		setValue('_date');
-	},
-
-	handlOnChange(e) {
-		this.setState({checked: e, acceptor:this.setChecked(e)});
-	},
-
-	createWrapper(name, defualt) {
-		return new WrapperData(this.state.acceptor, this.props.recordOld, name, defualt);
-	},
-
-	render() {
-		return(	<div className='indent solution_gik'>
-					<CheckBox label = {this.props.label} onChange={this.handlOnChange} checked={this.state.checked}/>
-					<FieldText className='fieldtext-line' label='№' text={this.createWrapper(this.props.fieldName + '_num', '')} enable={this.state.checked} />
-					<DateField data={this.createWrapper(this.props.fieldName + '_date', new Date())} enable={this.state.checked} />
-				</div>
-				)
 	}
 });

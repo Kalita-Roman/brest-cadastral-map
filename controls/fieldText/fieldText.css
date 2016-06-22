@@ -1,29 +1,56 @@
 .input-box-text .input-text {
-	padding: 3px;
 }
 
 .input-box-text .input-text.err {
 	box-shadow: 0 0 5px rgba(255,0,0,1);
 }
 
-.input-box-text p.err {
-	font-size: 10px;
-	color: #f00;
+.input-box-text.fieldtext-width {
+    float: left;
+    width: 100%;
 }
 
-.fieldtext-width .input-text {
+.input-box-text.fieldtext-width .input-text {
 	width: 100%;
+	float: left;
 }
 
-.fieldtext-width .input-label {
+.input-box-text.fieldtext-width .input-label {
 	display: block;
 	margin-bottom: 3px;
 }
 
-.fieldtext-line .input-label {
+.input-box-text.fieldtext-width .last_editor {
+	float: right;
+}
+
+
+
+.input-box-text.fieldtext-line {
+	width: 100%;
+	float: left;
+}
+
+.input-box-text.fieldtext-line .input-label {
+	float: left;
+    line-height: 25px;
+    margin-right: 5px;
+}
+
+.input-box-text.fieldtext-line .input-text {
+	width: 200px;
+    float: left;
+    margin-right: 5px;
+}
+
+.input-box-text.fieldtext-line .last_editor {
+	float: left;
+	line-height: 25px;
+}
+
+.input-box-text.fieldtext-line-short .input-label{
 	margin-right: 5px;	
 }
 
-.fieldtext-line .input-text {
-	width: 200px;	
-}
+
+

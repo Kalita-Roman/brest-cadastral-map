@@ -1,0 +1,23 @@
+.input-box-combobox {
+	width: 100%;
+	float: left;
+}
+
+.input-box-combobox .label {
+	float: left;
+	margin-right: 5px;
+}
+
+.input-box-combobox .indent {
+	width: 100%;
+	padding-left: 120px;
+}
+
+.input-box-combobox .indent select {
+	width: 100%;
+	float: left;
+}
+
+.input-box-combobox .last_editor {
+	float: right;
+}

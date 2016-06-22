@@ -10,11 +10,15 @@ import getRole from './auth/roles.js';
 import pubsub from './src/pubsub.js';
 import requests from './src/requests.js';
 
-let SetterStyle = function(opacity, _color) {
+let SetterStyle = function(opacity, _color, _colorLabel) {
 	let _acceptor;
 
 	this.color = function() {
 		return _color;
+	}()
+
+	this.colorLabel = function() {
+		return _colorLabel || '#000';
 	}()
 
 	this.currentOpacity = function() {
@@ -54,6 +58,7 @@ let loadLayer = function(layer) {
 
 			CityMap.setLayerFromDB(x, layer.setterStyle, layer.nameTable);
 		})
+		.catch(x => console.log(x));
 }
 
 const ControllerLayers = {
@@ -64,16 +69,16 @@ const ControllerLayers = {
 			name:'Проектируемые объекты (АПЗ)', 
 			nameTable: 'apz', 
 			color: '#afa', 
-			setterStyle: (() => new SetterStyle(0.7, '#afa'))(),
+			setterStyle: (() => new SetterStyle(0.7, '#afa', '#040'))(),
 			form: 'getForm_apz',
-			tables: [ 'func_zone' ],
+			tables: [ 'kind_building' ],
 			current: false
 		},
 		{ 
 			name:'Градопаспорта', 
 			nameTable: 'citypassport', 
 			color: '#aaf', 
-			setterStyle: (() => new SetterStyle(0.7, '#aaf'))(),
+			setterStyle: (() => new SetterStyle(0.7, '#aaf', '#004'))(),
 			form: 'getForm_citypassport',
 			tables: [ ],
 			current: true
@@ -89,7 +94,7 @@ const ControllerLayers = {
 	loadLayers() {
 		Promise.all(this.layers.map(loadLayer))
 			.then(() => {
-				this.setCheck(1);
+				this.setCheck(0);
 			})
 			.catch(x => { alert('Не удалось соединиться с базой данных!'); console.log(x); });
 	},
@@ -98,7 +103,7 @@ const ControllerLayers = {
 		let currentLayer = this.layers[key];
 		let data = { layer: currentLayer };
 		let body = {
-			action: 'edit',
+			action: 'selectForEdit',
 			tables: currentLayer.tables
 		};
 		requests.request('POST', '/db', body)
@@ -187,12 +192,11 @@ let insertToMap = function(e) {
 	let currentLayer = ControllerLayers.currentLayer;
 	let data = { layer: ControllerLayers.currentLayer };
 	let body = {
-		action: 'edit',
+		action: 'selectForEdit',
 		tables: ControllerLayers.currentLayer.tables
 	};
 	requests.request('POST', '/db', body)
 		.then(x => {
-			console.log(x);
 			data.refTables = x.refTables;
 			return ModalForm.showForm(role, data, 'fm_input' )
 		})
@@ -252,13 +256,14 @@ let editObject = function(e) {
 	let currentLayer = ControllerLayers.layers.find(l => l.nameTable === e.layer);
 	let data = { layer: currentLayer };
 	let body = {
-		action: 'edit',
+		action: 'selectForEdit',
 		body: {
 			layer: e.layer,
 			id: e.id
 		},
 		tables: currentLayer.tables
 	};
+	console.log(body);
 	requests.request('POST', '/db', body)
 		.then(x => {
 			data.record = x.record;
@@ -266,20 +271,26 @@ let editObject = function(e) {
 			return ModalForm.showForm(role, data, 'fm_input');
 		})
 		.then(x => { 
-			editedRecord = x.data;
+			let res = {};
+			for(let field in x.data) {
+				if(x.data[field] !== data.record[field]) {
+					res[field] = x.data[field];
+					data.record[field] = x.data[field];
+				}
+			}
 			let body = {
 				action: 'updateChanges',
 				body: {
 					layer: e.layer,
 					id: e.id,
 					editor: role.user.id,
-					fields: editedRecord,
+					fields: res,
 				}
 			};
 			return requests.request('POST', '/db', body);
 		})
 		.then(x => {
-			e.cb(editedRecord)
+			e.cb(data.record);
 		});
 }
 

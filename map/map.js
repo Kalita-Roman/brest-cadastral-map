@@ -46,7 +46,7 @@ let LayerEntity = function(_name, _lft_layer, setterStyle) {
     this.createLabel = function(record, shape) {
         let labelIcon = L.divIcon({
             className: 'map-label',
-            html: `<p>${record.name}</p>`
+            html: `<p style='color: ${setterStyle.colorLabel}'>${record.name}</p>`
         });
         return L.marker(shape.getBounds().getCenter(), {icon: labelIcon}).addTo(_lft_layer);
     }
@@ -58,14 +58,14 @@ let LayerEntity = function(_name, _lft_layer, setterStyle) {
 }
 
 let createHandlerClick = function(msgPopup) {
-     let handlButtonLeft = function(e) {
+     /*let handlButtonLeft = function(e) {
         let popup = L.popup()
             .setContent(msgPopup);
         e.target
             .bindPopup(popup)
             .openPopup(e.latlng)
             .unbindPopup();
-    }
+    }*/
 
     let handlButtonMiddle = function(e) {
         let target = e.target;
@@ -80,10 +80,11 @@ let createHandlerClick = function(msgPopup) {
     }
 
     return function(e) {
-        let handler = e.originalEvent.button === 1
+        /*let handler = e.originalEvent.button === 1
             ? handlButtonMiddle
             : handlButtonLeft
-        handler(e);
+        handler(e);*/
+        handlButtonMiddle(e);
     }
 }
 

@@ -10,6 +10,7 @@ var passport = require('./auth').passport;
 var app = express();
 
 app.use('/build', express.static('build'));
+app.use('/pictures', express.static('pictures'));
 app.use('/css', express.static('css'));
 app.use('/', express.static('map'));
 

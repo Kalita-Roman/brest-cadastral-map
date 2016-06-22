@@ -22,9 +22,15 @@ module.exports = React.createClass({
 
 	render() {
 		return (
-			<div className='input-box' >
-        			<label className='label'>{this.props.label}</label>
-                    <textarea className='textarea' value={this.state.value} onChange={this.handleChange}></textarea>
+			<div className='input-box-area' >
+        			<label className='input-label'>{this.props.label}</label>
+                    <textarea 
+                        className='textarea' 
+                        value={this.state.value} 
+                        onChange={this.handleChange}
+                        disabled={this.props.enable ? null :  "disabled"}
+                    ></textarea>
+                    <p className='last_editor'>{this.props.editor}</p>
                 </div>
 			)
 	}

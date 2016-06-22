@@ -1,16 +1,26 @@
-module.exports = function(newData, oldData, _name, defualt) {
+module.exports = function(newData, oldData, _name, defualt, flag) {
+
+	let setNewData = function() {
+		if(!newData) return;
+		newData[_name] = currentValue;
+	}
 	
-	newData[_name] = oldData && oldData[_name]
+	let currentValue = oldData && oldData[_name]
 		? oldData[_name]
 		: defualt;
 
+	if(flag)
+		setNewData();
+
 	this.name = _name;
 
+
 	this.set = function(value) {
-		newData[_name] = value;
+		currentValue = value;
+		setNewData();
 	}
 
 	this.get = function() {
-		return newData[_name];
+		return currentValue;
 	}
 }

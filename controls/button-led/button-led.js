@@ -12,8 +12,9 @@ module.exports = React.createClass({
 			? 'button-on'
 			: 'button-off';
 		let clName = 'button-led-body ' +  clOn;
+		let className = this.props.className ? ' ' + this.props.className : '';
 		return (
-			<div className="button-led-round">
+			<div className={"button-led-round"+className} >
 				<div className={clName} onClick={this.handlerClick}>
 				</div>
 			</div>

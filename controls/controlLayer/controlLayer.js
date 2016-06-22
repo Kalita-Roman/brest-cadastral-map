@@ -49,21 +49,20 @@ let ControlLayer = React.createClass({
 	makeCurrent(key) {
 		let newState = this.state;
 		newState.show = true;
-		this.switchCurrenting = <ButtonLed onClick={this.handlerSwitchCurrent} on={this.props.idKey === key} />
+		this.switchCurrenting = <ButtonLed className='item' onClick={this.handlerSwitchCurrent} on={this.props.idKey === key} />
 		this.setState(newState);
-
 	},
 
 	render() { 
 		return (
 		<div className="controlLayer">
 			<h2>{this.props.layer.name}</h2>
-			<div style={{backgroundColor: this.props.layer.color}} className='box-color'>
+			<div style={{backgroundColor: this.props.layer.color}} className='box-color item'>
 				<input type='checkbox' checked={this.state.show} onChange={this.handlerСheckbox} />
 			</div>
 			{this.switchCurrenting}
+			<button className='box-color filter' onClick={this.showFormFileters} ></button>
 			<input type='range' min="0" max="1" step="0.05" value={this.state.opacity} onChange={this.handlerRange} />
-			<button onClick={this.showFormFileters} >фильтры</button>
 		</div>
 	)}
 });

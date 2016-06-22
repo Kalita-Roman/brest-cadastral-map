@@ -56,9 +56,9 @@
 
 
 
+
 .buttomsbar {
 	width: 100%;
-	padding: 10px;
 	float: left;
 	text-align: right;
 }
@@ -69,4 +69,23 @@
 
 .inline {
 	display: inline-block;
+}
+
+.input-label {
+	
+}
+
+.last_editor {
+	color: #777;
+	font-size: 9px;
+}
+
+p.err {
+	font-size: 10px;
+	color: #f00;
+}
+
+input.err,
+select.err {
+	box-shadow: 0 0 5px rgba(255,0,0,1);
 }

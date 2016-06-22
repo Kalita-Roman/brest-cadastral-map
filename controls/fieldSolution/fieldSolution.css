@@ -1,0 +1,59 @@
+.input-box-solution {
+	width: 100%;
+	float: left;
+}
+
+.input-box-solution > div {
+	width: 100%;
+	float: left;
+}
+
+.input-box-solution > div:first-child {
+	margin-bottom: 3px;
+}
+
+.input-box-solution .checkbox {
+	float: left;
+	margin-right: 5px;
+}
+
+.input-box-solution .input-label {
+	float: left;
+}
+
+.input-box-solution .last_editor {
+	float: right;
+}
+
+.input-box-solution .calendar {
+	float: left;
+}
+
+.input-box-solution .react-datepicker__input-container input {
+	width: 150px;
+}
+
+.input-box-solution .indent {
+	width: 100%;
+	padding-left: 160px;
+}
+
+.input-box-solution.solution .input-text {
+	width: 100%;
+}
+
+.input-box-solution.solution .float-left {
+	float: left;
+}
+
+.input-box-solution.solutiongik .fields p {
+	float: left;
+	line-height: 24px;
+	margin-right: 5px;
+}
+
+.input-box-solution.solutiongik .fields .input-text {
+	width: 200px;
+	float: left;
+	margin-right: 5px;
+}

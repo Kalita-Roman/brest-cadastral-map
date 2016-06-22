@@ -4,6 +4,13 @@ var db = require('./connectionPostgreSQL.js');
 
 require("./polyfill.js");
 
+var log = function(x,y) {
+    console.log();
+    console.log(x);
+    console.log(y);
+    console.log();
+}
+
 var addTable = function(fils,  filters, nameTable) {
     var f = filters.find(x =>  x.filterName === nameTable);
     if(f)
@@ -34,13 +41,41 @@ var filter = function(filters) {
     }
 }
 
+var someRequests = function(getPromises) {
+	return db.task(_db => _db.batch(getPromises(_db)));
+}
+
+var LastEditors = function(body, rec) {
+    
+    let last = [];
+
+    this.add = function(field) {
+        last.push({
+            nametable: body.layer,
+            col: field,
+            idrec: body.id,
+            id_editor: body.editor,
+            date: rec.editing_date
+        });
+    }
+
+    this.setId = function(id) {
+        last.forEach(x => x.idrec = id);
+    }
+
+    this.getSomeRequests = function() {
+        return someRequests(_db => last.map(x => _db.none("DELETE FROM last WHERE (nametable=${nametable} AND col=${col} AND idrec=${idrec} ); INSERT INTO last(nametable, col, idrec, id_editor, date) VALUES(${nametable}, ${col}, ${idrec}, ${id_editor}, ${date});", x)));
+    }
+
+}
+
 var delupt = function(req, res, query) {
     var body = req.body.body;
     db.task(t => t.batch(body.map(x => t.one(query, x))))
-        .then(function (data) {
+        .then(data => {
             res.status(200).send('OK');
         })
-        .catch(function (error) {
+        .catch(error => {
             res.send(error);
         });;
 }
@@ -51,8 +86,7 @@ var handler = {
             .then(function (data) {
                 if(req.body.filters) {
                     var result = filter(req.body.filters)(data);
-                    var addition = {};
-                    res.send({ result: result, addition: addition });
+                    res.send({ result: result, addition: {} });
                 }
                 else {
                     res.send(data);
@@ -73,20 +107,27 @@ var handler = {
 
         var q1 = '';
         var q2 = '';
+        var last = new LastEditors(body, rec);
 
         for(var field in  body.fields) {
-            rec[field] = body.fields[field]
+            rec[field] = body.fields[field];
+            last.add(field);
             q1 += (', '+ field);
             q2 += (', ${' + field + '}');
         }
 
+        var id;
+
         db.one("INSERT INTO ${layer~}(geom, editor, editing_date" + q1 +") VALUES(${geom}, ${editor}, ${editing_date}" + q2 +") returning id", rec)
+            .then(data => {
+                id = data;
+                last.setId(data.id);
+                return last.getSomeRequests();
+            })
             .then(function (data) {
-                console.log(data);
-                res.status(201).send(data);
+                res.status(201).send(id);
             })
             .catch(function (error) {
-                console.log(error);
                 res.send(error);
             });
     },
@@ -95,8 +136,6 @@ var handler = {
     	var dateNow = new Date();
     	req.body.body.forEach(x => x.editingDate = dateNow);
 
-    
-
         delupt(req, res, "UPDATE ${layer~} SET geom=${geom}, editor=${editor}, editing_date=${editingDate} WHERE id=${id}");
     },
 
@@ -104,16 +143,7 @@ var handler = {
         delupt(req, res, "DELETE FROM ${layer~} WHERE id=${id}");
     },
 
-    edit: function(req, res) {
-      
-        var prec = new Promise((resolve, reject) => {
-            if(!req.body.body)
-                resolve({});
-            db.one("SELECT * FROM ${layer~} WHERE id=${id}", req.body.body)
-                .then(data => {
-					resolve({ name:'record', value:data });
-				});
-        });
+    selectForEdit: function(req, res) {
 
         var arrayToObj = function(arr, transform) {
             if(!transform) transform = x => x;
@@ -122,6 +152,40 @@ var handler = {
                 return prev 
             }, {});
         }
+      
+        var prec = new Promise((resolve, reject) => {
+        	var record;
+        	var editors;
+            if(!req.body.body)
+                resolve({});
+            //log(req.body);
+            db.one("SELECT * FROM ${layer~} WHERE id=${id}", req.body.body)
+                .then(data => {
+              //      log('__ЗАПИСЬ',data);
+                    record = data;
+                    return db.any("SELECT * FROM last WHERE (nametable=${layer} AND idrec=${id});", req.body.body);
+                })
+                .then(data => {
+                //    log('__РЕДАДКЦИИ',data);
+                    editors = data;
+                    return db.any("SELECT * FROM users");
+                })
+                .then(data => {
+                //    log('__РЕДАКТОРЫ',data);
+                    return editors.reduce(
+                        (prev, cur) => { 
+                            var editor = data.find(x => x.id === cur.id_editor);
+                            prev[cur.col] = { name: editor.name, date: cur.date }; return prev},
+                        {}
+                    );
+                })
+                .then(data => {
+                //    log('__ПОСЛЕДНЕЕ',data);
+                    record.editors = data;
+                    resolve({ name:'record', value:record });
+                });
+            //log('конец');
+        });
 
 	    var ptab = new Promise((resolve, reject) => {
 	    	
@@ -150,25 +214,23 @@ var handler = {
         rec.editing_date = new Date();
         rec.id = body.id;
 
-
-
         var q = '';
+        var last = new LastEditors(body, rec);
+
         for(var field in  body.fields) {
             rec[field] = body.fields[field]
+            last.add(field);
             q += (', ' + field + '=${' + field + '}');
         }
 
-        console.log();
-        console.log();
-        console.log(rec);
-        console.log();
-        console.log();
-      
         var qy = "UPDATE ${layer~} SET editor=${editor}, editing_date=${editing_date}" + q + " WHERE id=${id}";
 
-        db.query(qy, rec)
-            .then(function (data) {
-                res.status(201).send(data);
+        db.none(qy, rec)
+            .then(() => {
+            	return last.getSomeRequests();
+            })
+            .then(() => {
+                res.status(201);
             })
             .catch(function (error) {
                 console.log(error);
@@ -181,7 +243,7 @@ var handler = {
     showeditors(req, res) {
         var body = req.body.body;
 
-        db.any("SELECT * FROM users")
+        db.any("SELECT * FROM users WHERE role='editor'")
             .then(function (data) {
                 res.send(data);
             })

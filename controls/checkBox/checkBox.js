@@ -10,7 +10,8 @@ module.exports = React.createClass({
 
 	getDefaultProps() {
 		return {
-			checked: false
+			checked: false,
+			enable: true
 		}
 	},
 
@@ -25,10 +26,14 @@ module.exports = React.createClass({
 		let id = this.props.id;
 		return (
 				<div className='checkbox'>
-					<div className='inliner'>
-						<input id={id} type='checkbox' checked={this.state.checked} onChange={this.handlerСheckbox} />
+						<input 
+							id={id} 
+							type='checkbox' 
+							checked={this.state.checked}
+							onChange={this.handlerСheckbox} 
+							disabled={this.props.enable ? null :  "disabled"}
+						/>
 						<label for={id}>{this.props.label}</label>
-					</div>
 				</div>
 			);
 	}

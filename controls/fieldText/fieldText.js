@@ -1,24 +1,18 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import InputText from './inputText.js';
 
 import './fieldText.css';
 
 module.exports = React.createClass({
-    getInitialState: function() {
-        return { value: this.props.text.get() };
+    getInitialState() {
+        return { classErr: '' };
     },
 
-    handleChange: function(event) {
-        if(!this.props.enable) return;
-        let value = event.target.value;
-        if(this.props.numeric && isNaN(value)) return;
-        this.setState({value: value, classErr: ''});
-        this.props.text.set(value);
+    handleChange: function(value) {
         this.props.validator.set(value);
     },
 
-
-    getDefaultProps: function() {
+    getDefaultProps() {
         return {
             enable: true,
             validator: {
@@ -29,22 +23,17 @@ module.exports = React.createClass({
     },
 
     componentWillMount() {
- 
-        if(!this.props.enable) this.state.classEnable = 'notEnable';
         this.props.validator.set(this.props.text.get());
         this.props.validator.subscribe(this.setNoValid);
     },
 
     setNoValid(e) {
-        console.log(e);
         this.handlFocus = x => {
             this.handlFocus = null;
-            console.log('тут');
             this.setState({ classErr: '' });
             this.messageError = null;
         }
         this.messageError = (<p className='err'>{e.message}</p>);
-        console.log('здесь');
         this.setState({ classErr: 'err ' });
     },
 
@@ -54,18 +43,17 @@ module.exports = React.createClass({
     },
 
     render: function() {
-    		return (
-      			<div className={'input-box-text ' + this.props.className} >
-        			<label className='input-label'>{this.props.label}</label>
-                    <input 
-                        className={'input-text '+this.state.classErr} 
-                        type="text" 
-                        value={this.state.value} 
-                        onChange={this.handleChange} 
-                        onFocus={this.handlFocus}
-                        disabled={this.props.enable ? null :  "disabled"}
-                        ref={(c) => this._input = c}
-                        />
+            
+            let propsInput = {};
+            if(this.handlFocus)
+                propsInput.onFocus = this.handlFocus;
+            propsInput.ref = (c) => this._input = c;
+
+            return (
+                <div className={'input-box-text ' + this.props.className} >
+                    <label className='input-label'>{this.props.label}</label>
+                    <InputText className={this.state.classErr} text={this.props.text} onChange={this.handleChange} props={propsInput} enable={this.props.enable}/>
+                    <p className='last_editor'>{this.props.editor}</p>
                     {this.messageError}
                 </div>
         )

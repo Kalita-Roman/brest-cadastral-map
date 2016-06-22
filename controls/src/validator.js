@@ -52,3 +52,8 @@ module.exports.fillField = {
 	check(value) { return value !== '' },
 	message: 'Заполните поле.'
 }
+
+module.exports.selectField = {
+	check(value) { return value&&(value !== 0) },
+	message: 'Выберите значение.'
+}
