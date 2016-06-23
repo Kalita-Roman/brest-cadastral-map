@@ -22,9 +22,30 @@ var common_options_layer = {
     weight: null,         // Stroke weight
 };
 
+let Trigger = function(current) {
+    this.set = function(newCurrent) {
+        current = newCurrent;
+    }
+
+    this.findAction = function(actions) {
+        return actions[current];
+    }
+}
+
+let triggerForDelete = new Trigger('showEdit');
+
 let LayerEntity = function(_name, _lft_layer, setterStyle) {
     this.lft_layer = _lft_layer;
-    this.style = { color: setterStyle.color, fillColor: setterStyle.color, fillOpacity: setterStyle.currentOpacity };
+    this.getStyle = () => { return { 
+        color: setterStyle.color,
+        fillColor: setterStyle.color,
+        fillOpacity: setterStyle.currentOpacity 
+    }};
+   /* this.style = (() => { return { 
+        color: setterStyle.color,
+        fillColor: setterStyle.color,
+        fillOpacity: setterStyle.currentOpacity 
+    } } )();*/
     setterStyle.setAcceptor((x) => _lft_layer.setStyle( { fillOpacity: x } ));
     _lft_layer.nameLayer = _name;
 
@@ -34,7 +55,7 @@ let LayerEntity = function(_name, _lft_layer, setterStyle) {
         lft_shapeObj.idObj = record.id;
         lft_shapeObj.addEventListener('click', createHandlerClick(record.name));
         lft_shapeObj.options = common_options_layer;
-        lft_shapeObj.setStyle(this.style);
+        lft_shapeObj.setStyle(this.getStyle());
         lft_shapeObj.nameLayer = _name;
         _lft_layer.addLayer(lft_shapeObj);
 
@@ -58,16 +79,9 @@ let LayerEntity = function(_name, _lft_layer, setterStyle) {
 }
 
 let createHandlerClick = function(msgPopup) {
-     /*let handlButtonLeft = function(e) {
-        let popup = L.popup()
-            .setContent(msgPopup);
-        e.target
-            .bindPopup(popup)
-            .openPopup(e.latlng)
-            .unbindPopup();
-    }*/
+    let empty = () => {};
 
-    let handlButtonMiddle = function(e) {
+    let showEdit = function(e) {
         let target = e.target;
         let targetLayer = layersOnMap.get(target.nameLayer);
         let lft_layer = targetLayer.lft_layer;
@@ -77,14 +91,10 @@ let createHandlerClick = function(msgPopup) {
             lft_layer.removeLayer(label);
             rowTable.label = targetLayer.createLabel(xe, target);
         } });
-    }
+    };
 
     return function(e) {
-        /*let handler = e.originalEvent.button === 1
-            ? handlButtonMiddle
-            : handlButtonLeft
-        handler(e);*/
-        handlButtonMiddle(e);
+        triggerForDelete.findAction({showEdit, empty})(e);
     }
 }
 
@@ -94,7 +104,7 @@ let setLayer = function(shapeObj, record) {
 
 let updateStyleLayer = function(shapeObj) {
     shapeObj.options = common_options_layer;
-    shapeObj.setStyle(currentLayer.style);
+    shapeObj.setStyle(currentLayer.getStyle());
 };
 
 function takeShape(e) {
@@ -120,8 +130,11 @@ let actions = [
 });
 
 map.on('draw:editstop', x => {
-    currentLayer.lft_layer.setStyle(currentLayer.style);
+    currentLayer.lft_layer.setStyle(currentLayer.getStyle());
 } );
+
+map.on('draw:deletestart', x => triggerForDelete.set('empty'));
+map.on('draw:deletestop', x => triggerForDelete.set('showEdit'));
 
 let InterfaceMap = {
 
@@ -140,6 +153,9 @@ let InterfaceMap = {
     },
 
     setLayerFromDB(records, setterStyle, nameLayer) {
+
+        this.removeLayer(nameLayer)
+
         let convertGeom = function(geom) {
             return JSON.parse(geom).geometry.coordinates[0].map(x => [x[1], x[0]]);
         }
@@ -174,7 +190,8 @@ let InterfaceMap = {
 
     removeLayer(nameLayer) {
         let groupUsed = layersOnMap.get(nameLayer);
-        groupUsed.lft_layer.onRemove(map);
+        if(groupUsed)
+            groupUsed.lft_layer.onRemove(map);
         layersOnMap.delete(nameLayer);
     }
 }

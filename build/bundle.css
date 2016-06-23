@@ -126,166 +126,7 @@
 .filterDate .inliner > * {
 	vertical-align: middle;
 	display: inline-block;
-}.input-calendar {
-  font-family: 'Pontano Sans', sans-serif;
-  position: relative;
-}
-
-.input-calendar-wrapper {
-  position: absolute;
-  padding: 5px 12px;
-  border: 1px solid #c4c4c4;
-  border-radius: 5px;
-  box-shadow: 0 0 9px 5px rgba(0,0,0,0.05);
-  background-color: #fff;
-  text-align: center;
-  left: 140px;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-.input-calendar .input-calendar-field {
-  width: 120px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-family: 'Pontano Sans', sans-serif;
-  font-size: 16px;
-  padding: 2px 8px;
-}
-
-.input-calendar .input-calendar-field:focus {
-  outline: none;
-  border: 1px solid #f39c12;
-}
-
-.input-calendar .calendar-icon {
-  display: inline-block;
-  padding: 0px 1px 0 5px;
-  height: 27px;
-  line-height: 27px;
-  transform: translateY(4px);
-  cursor: pointer;
-}
-
-.input-calendar .days,
-.input-calendar .months,
-.input-calendar .years {
-  width: 189px;
-  padding-bottom: 2px;
-}
-
-.input-calendar .cell {
-  display: inline-block;
-  text-align: center;
-  cursor: pointer;
-  border: 1px solid #fff;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-.input-calendar .cell:hover {
-  color: #f39c12;
-  border: 1px solid #f39c12;
-  border-radius: 4px;
-}
-
-.input-calendar .cell.current {
-  background: #f39c12;
-  color: #fff;
-  border-radius: 4px;
-  opacity: .8;
-}
-
-.input-calendar .day {
-  width: 25px;
-  height: 25px;
-  line-height: 25px;
-}
-
-.input-calendar .day.prev,
-.input-calendar .day.next {
-  opacity: .4;
-}
-
-.input-calendar .month {
-  width: 58px;
-  height: 38px;
-  line-height: 38px;
-}
-
-.input-calendar .year {
-  width: 58px;
-  height: 38px;
-  line-height: 38px;
-}
-
-.input-calendar .days-title .cell {
-  height: 25px;
-  line-height: 28px;
-  opacity: 0.5;
-  cursor: default;
-}
-
-.input-calendar .days-title .cell:hover {
-  color: #000;
-  border: 1px solid #fff;
-}
-
-.input-calendar .navigation-title {
-  width: 100px;
-  display: inline-block;
-  cursor: pointer;
-}
-
-.input-calendar .years-view .navigation-title {
-  cursor: default;
-}
-
-.input-calendar .years-view .navigation-title:hover {
-  color: #000;
-}
-
-.input-calendar .navigation-title:hover {
-  color: #f39c12;
-}
-
-.input-calendar .icon-wrapper {
-  cursor: pointer;
-}
-
-.input-calendar .icon:hover,
-.input-calendar .today-btn:hover,
-.input-calendar .icon-wrapper:hover {
-  color: #f39c12;
-}
-
-.input-calendar .icon {
-  cursor: pointer;
-  width: 20px;
-}
-
-.input-calendar .today-btn {
-  cursor: pointer;
-}
-
-.input-calendar .cell.day.today {
-  position: relative;
-}
-
-.input-calendar .cell.day.today:after {
-  content: '.';
-  position: absolute;
-  bottom: 15px;
-  font-size: 20px;
-  color: #F39C12;
-}
-.react-datepicker__tether-element-attached-top .react-datepicker__triangle, .react-datepicker__tether-element-attached-bottom .react-datepicker__triangle, .react-datepicker__year-read-view--down-arrow {
+}.react-datepicker__tether-element-attached-top .react-datepicker__triangle, .react-datepicker__tether-element-attached-bottom .react-datepicker__triangle, .react-datepicker__year-read-view--down-arrow {
   margin-left: -8px;
   position: absolute;
 }
@@ -621,13 +462,10 @@
 	float: left;
 }
 
-.input-box-solution .react-datepicker__input-container input {
-	width: 150px;
-}
 
 .input-box-solution .indent {
 	width: 100%;
-	padding-left: 160px;
+	padding-left: 110px;
 }
 
 .input-box-solution.solution .input-text {
@@ -638,9 +476,27 @@
 	float: left;
 }
 
+.input-box-solution.solution .react-datepicker__input-container {
+	width: 90px;
+}
+
+.input-box-solution.solution .react-datepicker__input-container input{
+	width: 100px;
+}
+
+
+.input-box-solution.solutiongik .fields .react-datepicker__input-container {
+	float: left;
+	margin-right: 5px;
+}
+
+.input-box-solution.solutiongik .fields .react-datepicker__input-container input {
+	width: 150px;
+}
+
 .input-box-solution.solutiongik .fields p {
 	float: left;
-	line-height: 24px;
+	line-height: 20px;
 	margin-right: 5px;
 }
 
@@ -703,15 +559,13 @@
 	float: left;
 }
 
-
-
-
-
 .buttomsbar {
 	width: 100%;
 	float: left;
 	text-align: right;
 }
+
+
 
 .form-button:not(:first-child) {
 	margin-left: 10px; 
@@ -829,7 +683,18 @@ select.err {
 .filterHearder {
 	font-size: 20px;
 	font-weight: bold;
-}.table {
+}
+.editors .buttomsbar-top {
+	text-align: left;
+	margin-bottom: 5px;
+}
+
+.editors .table {
+	float: left;
+	margin-bottom: 15px;
+}
+
+.editors .table .table-rows {
 	height: 500px;
     overflow-y: scroll;
     float: left;
@@ -892,6 +757,25 @@ select.err {
 
 .row .btn:hover {
 	background-color: #ddd;
+}
+
+.form-content.editor-one .input-box-text {
+	margin-bottom: 5px;
+}
+
+.form-content.editor-one .input-box-text .input-label{
+	display: inline-block;
+    float: left;
+}
+
+.form-content.editor-one .input-box-text .indent {
+	width: 100%;
+	padding-left: 100px;
+}
+
+.form-content.editor-one .input-box-text .input-text{
+	display: inline-block;
+    width: 100%;
 }.controlLayer {
 	width: 100%;
 	float: left;
@@ -1001,24 +885,37 @@ select.err {
 	margin-bottom: 3px;
 }
 
-.userExit {
-	display: block;
-	width: 70px;
+.likebutton {
+	width: 100%;
 	line-height: 16px;
 	font-size: 10px;
 	text-transform: uppercase;
 	text-align: center;
 	border: 1px solid #999;
 	border-radius: 5px;
-}
-
-.userExit:hover {
-	background-color: #ddd;
-}
-
-.userExit, .userExit:hover {
-	text-decoration: none;
+	background-color: inherit;
 	color: inherit;
 	cursor: pointer;
 }
-/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYnVuZGxlLmNzcyIsInNvdXJjZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Iiwic291cmNlUm9vdCI6IiJ9*/
+
+button.likebutton {
+	margin-bottom: 3px;
+}
+
+a.likebutton {
+	text-decoration: none;
+}
+
+.userExit {
+	display: block;
+}
+
+.userExit:hover {
+	/*background-color: #ddd;*/
+}
+
+.userExit .userExit:hover {
+	/*color: inherit;*/
+	/*cursor: pointer;*/
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYnVuZGxlLmNzcyIsInNvdXJjZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OzsiLCJzb3VyY2VSb290IjoiIn0=*/

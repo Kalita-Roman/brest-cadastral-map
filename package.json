@@ -51,11 +51,9 @@
     "leaflet": "^0.7.7",
     "leaflet-draw": "^0.3.0",
     "moment": "^2.13.0",
-    "moment-range": "^2.2.0",
     "react": "^15.0.1",
     "react-datepicker": "^0.27.0",
     "react-dom": "^15.0.1",
-    "react-input-calendar": "^0.3.8",
     "style-loader": "^0.12.2",
     "webpack": "^1.13.0"
   }

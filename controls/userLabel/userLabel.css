@@ -26,23 +26,36 @@
 	margin-bottom: 3px;
 }
 
-.userExit {
-	display: block;
-	width: 70px;
+.likebutton {
+	width: 100%;
 	line-height: 16px;
 	font-size: 10px;
 	text-transform: uppercase;
 	text-align: center;
 	border: 1px solid #999;
 	border-radius: 5px;
+	background-color: inherit;
+	color: inherit;
+	cursor: pointer;
+}
+
+button.likebutton {
+	margin-bottom: 3px;
+}
+
+a.likebutton {
+	text-decoration: none;
+}
+
+.userExit {
+	display: block;
 }
 
 .userExit:hover {
-	background-color: #ddd;
+	/*background-color: #ddd;*/
 }
 
-.userExit, .userExit:hover {
-	text-decoration: none;
-	color: inherit;
-	cursor: pointer;
+.userExit .userExit:hover {
+	/*color: inherit;*/
+	/*cursor: pointer;*/
 }

@@ -10,6 +10,40 @@ import getRole from './auth/roles.js';
 import pubsub from './src/pubsub.js';
 import requests from './src/requests.js';
 
+
+
+
+
+function SubscribePane(url) {
+
+	function subscribe() {
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function() {
+			if (this.readyState != 4) return;
+			if (this.status == 200) {
+				ControllerLayers.loadLayers();
+				subscribe();
+				return;
+			}
+			if (this.status != 404) { // 404 может означать, что сервер перезагружается
+				console.log(this.statusText); // показать ошибку
+			}
+			//setTimeout(subscribe, 1000); // попробовать ещё раз через 1 сек
+		}
+		xhr.open("GET", url, true);
+		xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+		xhr.send();
+	}
+
+	subscribe();
+
+}
+
+SubscribePane('/publish');
+
+
+
+
 let SetterStyle = function(opacity, _color, _colorLabel) {
 	let _acceptor;
 
@@ -21,9 +55,10 @@ let SetterStyle = function(opacity, _color, _colorLabel) {
 		return _colorLabel || '#000';
 	}()
 
-	this.currentOpacity = function() {
-		return opacity;
-	}();
+	// TODO: Надо разобраться. Почему? Как?
+	this.currentOpacity = opacity;/* = function() {
+		return _opacity;
+	}();*/
 
 	this.setAcceptor = function(acceptor) {
 		acceptor(opacity);
@@ -31,7 +66,8 @@ let SetterStyle = function(opacity, _color, _colorLabel) {
 	};
 
 	this.setOpacity = function(value) {
-		opacity = value;
+		//opacity = value;
+		this.currentOpacity = value;
 		this._acceptor(value);
 	};
 }
@@ -46,39 +82,34 @@ let loadLayer = function(layer) {
 	};
 	return requests.requestToDB(body)
 		.then(x => {
-			var dates = x.map(y => new Date(y.editing_date));
-			var maxDate = Math.max.apply(Math, dates);
-			var minDate = Math.min.apply(Math, dates);
-
-			layer.filters = [ {
-				filterName: 'rangeDate',
-				start: new Date(minDate),
-				end: new Date(maxDate)
-			} ];
-
 			CityMap.setLayerFromDB(x, layer.setterStyle, layer.nameTable);
 		})
 		.catch(x => console.log(x));
 }
+
+let style_1 = new SetterStyle(0.7, '#afa', '#040');
+let style_2 = new SetterStyle(0.7, '#aaf', '#004');
 
 const ControllerLayers = {
 	currentLayer: null,
 
 	layers:  [
 		{ 
-			name:'Проектируемые объекты (АПЗ)', 
+			name:'Текущие объекты', 
+			nameFormInput: 'Текущий объект', 
 			nameTable: 'apz', 
 			color: '#afa', 
-			setterStyle: (() => new SetterStyle(0.7, '#afa', '#040'))(),
+			setterStyle: style_1,
 			form: 'getForm_apz',
 			tables: [ 'kind_building' ],
 			current: false
 		},
 		{ 
 			name:'Градопаспорта', 
+			nameFormInput: 'Градопаспорт', 
 			nameTable: 'citypassport', 
 			color: '#aaf', 
-			setterStyle: (() => new SetterStyle(0.7, '#aaf', '#004'))(),
+			setterStyle: style_2,
 			form: 'getForm_citypassport',
 			tables: [ ],
 			current: true
@@ -122,7 +153,6 @@ const ControllerLayers = {
 				requests.requestToDB(body)
 					.then( x => {
 						let result = x.result;
-						CityMap.removeLayer(currentLayer.nameTable);
 						CityMap.setLayerFromDB(result, currentLayer.setterStyle, currentLayer.nameTable);
 						CityMap.setCurrentLayer(this.currentLayer.nameTable, result => loadLayer(this.currentLayer, result));
 					});
@@ -263,7 +293,6 @@ let editObject = function(e) {
 		},
 		tables: currentLayer.tables
 	};
-	console.log(body);
 	requests.request('POST', '/db', body)
 		.then(x => {
 			data.record = x.record;

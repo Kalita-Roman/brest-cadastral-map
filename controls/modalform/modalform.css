@@ -53,15 +53,13 @@
 	float: left;
 }
 
-
-
-
-
 .buttomsbar {
 	width: 100%;
 	float: left;
 	text-align: right;
 }
+
+
 
 .form-button:not(:first-child) {
 	margin-left: 10px; 

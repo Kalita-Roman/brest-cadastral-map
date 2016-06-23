@@ -66,10 +66,12 @@ module.exports = React.createClass({
 		};
 	},
 
-	getFieldName()  { 
-		return <div className="name">
-			<FieldText label='Название объекта' text={new WrapperData(this.record, 'name', '')} focus={true} enable={this.enable}/>
-		</div> 
+	getCommonProps(nameField) {
+		let props = {};
+		props.enable = this.enable;
+		if(this.enable)
+			props.editor = this.getEditor(nameField);
+		return props;
 	},
 
 	createComboBox(label, nameField) {
@@ -81,18 +83,16 @@ module.exports = React.createClass({
 		if(!wrapperData.get())
 			items.splice(0,0, { value: 0, label: '' } );
 
-		console.log(wrapperData.get());
+		items.sort((a, b) => a.value - b.value);
 
 		return (
 			<ComboBox 
-				//className={'margin-bottom'}
 				label={label} 
 				value={wrapperData.get()} 
 				options={items} 
 				validator={this.validator.get(selectField)}
 				onChange={e => wrapperData.set(e.target.value)}
-				editor={this.getEditor(nameField)}
-				enable={this.enable}
+				{...this.getCommonProps(nameField)}
 			/>
 		)
 	},
@@ -113,38 +113,32 @@ module.exports = React.createClass({
 			label={label}
 			text={this.createWrapper(nameField, '')}
 			validator={this.validator.get(fillField)}
-			enable={this.enable}
 			focus={arrFlags.includes('focus')}
 			numeric={arrFlags.includes('numeric')} 
-			editor={this.getEditor(nameField)}
+			{...this.getCommonProps(nameField)}
 			/>);
 	},
 
 	createFieldSolution(label, nameField, names, className) {
-		let nameEditor = '';
-			if(this.props.data.record) {
-				let editor = this.props.data.record.editors[nameField + '_num']||this.props.data.record.editors[nameField + '_date'];
-				nameEditor = this.getNameEditor(editor);
-			}
 		return (<FieldSolution 
 			recordNew = {this.record} 
 			recordOld = {this.props.data.record} 
 			className={className + ' margin-bottom'}
 			label={label}
 			nameField={nameField}
-			editor={nameEditor}
-			enable={this.enable}
-			type={names}/>)
+			type={names}
+			{...this.getCommonProps(nameField + '_date')}
+			/>)
 	},
 
 	createFieldSolution_s(label, nameField) {
 		const names = {type: 'getType_1', date: '_date', note: '_note'};
-		return this.createFieldSolution(label, nameField, names, 'solution');
+		return this.createFieldSolution(...arguments, names, 'solution');
 	},
 
 	createFieldSolution_gik(label, nameField) {
 		const names = {type: 'getType_2', date: '_date', note: '_num'};
-		return this.createFieldSolution(label, nameField, names, 'solutiongik');
+		return this.createFieldSolution(...arguments, names, 'solutiongik');
 	},
 
 	createDate(label, nameField) {
@@ -152,9 +146,7 @@ module.exports = React.createClass({
 				<DateFieldLabel 
 					label={label}
 					data={new WrapperData(this.record, this.props.data.record, nameField, null)} 
-					enable={this.enable}
-					editor={this.getEditor(nameField)}
-					show={true}
+					{...this.getCommonProps(nameField)}
 				/>
 				);
 	},
@@ -175,11 +167,11 @@ module.exports = React.createClass({
 					{this.createField('fieldtext-width', 'Адрес объекта', 'adress')}
 					{this.createField('fieldtext-width', 'Заказчик', 'customer')}
 					{this.createComboBox('Вид строительства', 'kind_building')}
+					{this.createFieldSolution_s('Регистрация в реестре ГГК', 'registry')}
 					{this.createFieldSolution_s('Архитектурно-планировочное задание', 'task')}
 					{this.createFieldSolution_s('Согласование гл. архитектора города', 'architect')}
 					{this.createFieldSolution_s('Экспертиза проекта', 'expertise')}
 					{this.createFieldSolution_s('Решение Госстройнадзора', 'gosstroynadzor')}
-					{this.createFieldSolution_s('Регистрация в реестре', 'registry')}
 					{this.createDateRange('Сроки строительства проектные', 'proj')}
 					{this.createDateRange('Сроки строительства фактические', 'fact')}
 				</div>);
@@ -204,14 +196,14 @@ module.exports = React.createClass({
 					{this.createField('fieldtext-width', 'Победитель аукциона', 'winnerauction')}
 					{this.createFieldSolution_gik('Решение ГИК на разработку градопаспорта','solgik_develpass')}
 					{this.createFieldSolution_gik('Решение ГИК об утверждении градопаспорта','solgik_statepass')}
-					<Textarea label='Заметка' text={this.createWrapper('note', '')} enable={this.enable} editor={this.getEditor('note')} />
+					<Textarea label='Заметка' text={this.createWrapper('note', '')} {...this.getCommonProps('note')} />
 				</div>);
 	},
 
 	render: function() {
 		let getFrom = this[this.props.data.layer.form];
 		return (<div className='form-content'>
-					<h1 className='name_form'>{this.props.data.layer.name}</h1>
+					<h1 className='name_form'>{this.props.data.layer.nameFormInput}</h1>
 					{getFrom()}
 					{this.getButtoms()}
 				</div>)

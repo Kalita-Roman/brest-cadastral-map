@@ -14,7 +14,7 @@ module.exports = React.createClass({
 
 	setAdmin() {
 		this.buttons = (
-				<button onClick={e => this.props.pubsub.publish('showEditors', 'ред')}>Редакторы</button>
+				<button className='likebutton' onClick={e => this.props.pubsub.publish('showEditors', 'ред')}>Редакторы</button>
 			);
 	},
 
@@ -26,7 +26,7 @@ module.exports = React.createClass({
 				<p className='userName' >{user.name}</p>
 				<p className='userPost' >{user.post}</p>
 				{this.buttons}
-				<a className='userExit' href="/logout">Выход</a>
+				<a className='userExit likebutton' href="/logout">Выход</a>
 			</div>
 		);
 	}

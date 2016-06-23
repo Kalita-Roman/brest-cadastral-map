@@ -91,8 +91,8 @@ let getType_2 = function(enable, clWrapper) {
 					<p>№</p>
 					<InputText text={this.createWrapper(this.props.nameField + this.props.type.note, '')} enable={enable} />
 					{createDate.bind(this)(enable)}
+					<p className='last_editor'>{this.props.editor}</p>
                 </div>
-				<p className='last_editor'>{this.props.editor}</p>
 			</div>
 			)
 }

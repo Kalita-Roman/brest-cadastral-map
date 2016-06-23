@@ -3,8 +3,10 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var upload = require('multer')();  // for parsing multipart/form-data
-var db = require('./database/db.js').database;
 var passport = require('./auth').passport;
+
+var db = require('./database/db.js').database;
+var longpoll = require('./database/longpoll.js');
 
 
 var app = express();
@@ -37,6 +39,10 @@ app.get('/', function (req, res) {
   	res.sendFile('index.html', { root: __dirname } , (e) => { if(e) console.log(e); });
 });
 
+app.get('/publish', function (req, res) {
+    longpoll.onSubscribe(req, res);
+});
+
 app.get('/login',
   	function(req, res) {
         res.sendFile('login.html', { root: __dirname });
@@ -56,7 +62,9 @@ app.get('/logout',
         res.redirect('/');
     });
 
-app.post('/db', upload.array(), db);
+app.post('/db', upload.array(), function(req, res){
+    db(req, res, longpoll.publish);
+});
 
 app.get('/user', function(req, res){
     res.send(false);

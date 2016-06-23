@@ -29,13 +29,10 @@
 	float: left;
 }
 
-.input-box-solution .react-datepicker__input-container input {
-	width: 150px;
-}
 
 .input-box-solution .indent {
 	width: 100%;
-	padding-left: 160px;
+	padding-left: 110px;
 }
 
 .input-box-solution.solution .input-text {
@@ -46,9 +43,27 @@
 	float: left;
 }
 
+.input-box-solution.solution .react-datepicker__input-container {
+	width: 90px;
+}
+
+.input-box-solution.solution .react-datepicker__input-container input{
+	width: 100px;
+}
+
+
+.input-box-solution.solutiongik .fields .react-datepicker__input-container {
+	float: left;
+	margin-right: 5px;
+}
+
+.input-box-solution.solutiongik .fields .react-datepicker__input-container input {
+	width: 150px;
+}
+
 .input-box-solution.solutiongik .fields p {
 	float: left;
-	line-height: 24px;
+	line-height: 20px;
 	margin-right: 5px;
 }
 

@@ -71,18 +71,18 @@ var LastEditors = function(body, rec) {
 
 var delupt = function(req, res, query) {
     var body = req.body.body;
-    db.task(t => t.batch(body.map(x => t.one(query, x))))
+    return db.task(t => t.batch(body.map(x => t.one(query, x))))
         .then(data => {
             res.status(200).send('OK');
         })
-        .catch(error => {
+        /*.catch(error => {
             res.send(error);
-        });;
+        });;*/
 }
 
 var handler = {
     select: function(req, res) {
-        db.any("SELECT * FROM $1~", [req.body.layer])
+    return db.any("SELECT * FROM $1~", [req.body.layer])
             .then(function (data) {
                 if(req.body.filters) {
                     var result = filter(req.body.filters)(data);
@@ -91,10 +91,10 @@ var handler = {
                 else {
                     res.send(data);
                 }
-            })
-            .catch(function (error) {
-                res.send('error');
             });
+            /*.catch(function (error) {
+                res.send('error');
+            });*/
     },
 
     insert: function(req, res) {
@@ -118,7 +118,7 @@ var handler = {
 
         var id;
 
-        db.one("INSERT INTO ${layer~}(geom, editor, editing_date" + q1 +") VALUES(${geom}, ${editor}, ${editing_date}" + q2 +") returning id", rec)
+        return db.one("INSERT INTO ${layer~}(geom, editor, editing_date" + q1 +") VALUES(${geom}, ${editor}, ${editing_date}" + q2 +") returning id", rec)
             .then(data => {
                 id = data;
                 last.setId(data.id);
@@ -126,21 +126,21 @@ var handler = {
             })
             .then(function (data) {
                 res.status(201).send(id);
-            })
-            .catch(function (error) {
-                res.send(error);
             });
+            /*.catch(function (error) {
+                res.send(error);
+            });*/
     },
 
     update: function(req, res) {
     	var dateNow = new Date();
     	req.body.body.forEach(x => x.editingDate = dateNow);
 
-        delupt(req, res, "UPDATE ${layer~} SET geom=${geom}, editor=${editor}, editing_date=${editingDate} WHERE id=${id}");
+        return delupt(req, res, "UPDATE ${layer~} SET geom=${geom}, editor=${editor}, editing_date=${editingDate} WHERE id=${id}");
     },
 
     delete: function(req, res) {
-        delupt(req, res, "DELETE FROM ${layer~} WHERE id=${id}");
+        return delupt(req, res, "DELETE FROM ${layer~} WHERE id=${id}");
     },
 
     selectForEdit: function(req, res) {
@@ -198,14 +198,14 @@ var handler = {
             	});
 	    });
 
-	    Promise.all([prec, ptab])
+	    return Promise.all([prec, ptab])
 	    	.then( data => {
                 var result = arrayToObj(data);
 	    		res.send(result);
 	    	});
     },
 
-    updateChanges: function(req, res) {
+    updateChanges: function(req, res, cb) {
         var body = req.body.body;
       
         var rec = {}
@@ -225,72 +225,87 @@ var handler = {
 
         var qy = "UPDATE ${layer~} SET editor=${editor}, editing_date=${editing_date}" + q + " WHERE id=${id}";
 
-        db.none(qy, rec)
-            .then(() => {
+        return db.query(qy, rec)
+            .then(data => {
             	return last.getSomeRequests();
             })
-            .then(() => {
-                res.status(201);
-            })
-            .catch(function (error) {
-                console.log(error);
-                res.send(error);
+            .then(data => {
+                res.status(201).send(data);
+                cb();
             });
+            /*.catch(function (error) {
+                console.log('ERROR\n',error);
+                res.send(error);
+            });*/
     },
-
-
 
     showeditors(req, res) {
         var body = req.body.body;
 
-        db.any("SELECT * FROM users WHERE role='editor'")
+        return db.any("SELECT * FROM users WHERE role='editor'")
             .then(function (data) {
                 res.send(data);
-            })
-            .catch(function (error) {
-                res.send('error');
             });
+            /*.catch(function (error) {
+                res.send('error');
+            });*/
     },
 
     editorInsert(req, res) {
-        db.one("INSERT INTO users(name, post, username, password, role) VALUES(${name}, ${post}, ${username}, ${password}, 'editor') returning id", req.body.user)
+        return db.one("INSERT INTO users(name, post, username, password, role) VALUES(${name}, ${post}, ${username}, ${password}, 'editor') returning id", req.body.user)
             .then(function (id) {
                 res.status(201).send(id);
             })
-            .catch(function (error) {
+          /*  .catch(function (error) {
                 res.send(error);
-            });
+            }); */
     },
 
     editorDelete(req, res) {
-        db.one("DELETE FROM users WHERE id=${id}", req.body.user)
+        return db.one("DELETE FROM users WHERE id=${id}", req.body.user)
             .then(function (data) {
                 res.status(200).send('OK');
-            })
-            .catch(function (error) {
-                res.send(error);
             });
+            /*.catch(function (error) {
+                res.send(error);
+            });*/
     },
 
     editorUpdate(req, res) {
       
-        db.one("UPDATE users SET name=${name}, post=${post}, username=${username}, password=${password} WHERE id=${id}", req.body.user)
+        return db.one("UPDATE users SET name=${name}, post=${post}, username=${username}, password=${password} WHERE id=${id}", req.body.user)
             .then(function (data) {
                 res.status(200).send('OK');
-            })
-            .catch(function (error) {
-                res.send(error);
             });
+            /*.catch(function (error) {
+                res.send(error);
+            });*/
     }
 }
 
 
-module.exports.database = function(req, res) {
+let longpollFuncs = [
+    'updateChanges',
+    'delete',
+    'update',
+    'insert'
+];
+
+
+module.exports.database = function(req, res, cb) {
     
     if(!req.body.action) { 
         res.send(false);
         return;
     }
 
-    handler[req.body.action](req, res);
+    handler[req.body.action](req, res, cb)
+        .then(() => {
+            if(longpollFuncs.includes(req.body.action))
+                cb();
+
+        })
+        .catch(error => {
+            res.send(error);
+        });
 }

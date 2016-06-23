@@ -34,7 +34,7 @@ let Table = React.createClass({
 		let items = this.props.items.map((e, i) => { return ( <Row className='row' key={i} user={e} btn={createBtn(e)} /> ) });
 		
 		return (
-			<div className='table'>
+			<div className='table-rows'>
 				{items}
 			</div>
 		)
@@ -88,6 +88,7 @@ module.exports = React.createClass({
 
 			let update = function() {
 				newRec.id = this.state.currentUser.id;
+				console.log(newRec);
 				this.props.handleClick({ 
 					action: 'editorUpdate',
 					user: newRec
@@ -122,7 +123,7 @@ module.exports = React.createClass({
 		let buttons = this.state.currentUser ? buttonsEdit : buttonsAdd;
 
 		let createWrapper = function(name) {
-			return new WrapperData(newRec, this.state.currentUser, name, '');
+			return new WrapperData(newRec, this.state.currentUser, name, '', true);
 		};
 
 		
@@ -140,12 +141,12 @@ module.exports = React.createClass({
 
 		let ch = new ConditionsKit(fillField, checkUserName);
 
-		return (<div>
-					<div className='form-content'>
-						<FieldText label='ФИО' text={createWrapper.bind(this)('name')} validator={this.validator.get(fillField)} focus={true} />
-						<FieldText label='Должность' text={createWrapper.bind(this)('post')} validator={this.validator.get(fillField)} />
-						<FieldText label='Пользователь' text={createWrapper.bind(this)( 'username')} validator={this.validator.get(ch)} />
-						<FieldText label='Пароль' text={createWrapper.bind(this)('password')} validator={this.validator.get(fillField)} />
+		return (<div className='form-content editor-one'>
+					<div >
+						<FieldText label='ФИО' text={createWrapper.bind(this)('name')} validator={this.validator.get(fillField)} focus={true} type='simpe' />
+						<FieldText label='Должность' text={createWrapper.bind(this)('post')} validator={this.validator.get(fillField)}  type='simpe' />
+						<FieldText label='Пользователь' text={createWrapper.bind(this)( 'username')} validator={this.validator.get(ch)}  type='simpe' />
+						<FieldText label='Пароль' text={createWrapper.bind(this)('password')} validator={this.validator.get(fillField)}  type='simpe' />
 					</div>
 					{buttons}
 			</div>);
@@ -158,9 +159,11 @@ module.exports = React.createClass({
 			post: 'Должность'
 		}
 
-		return (<div>
-					<div className='form-content'>
+		return (<div className='form-content editors'>
+					<div className='buttomsbar-top'>
 						<Button text='Добавить редактора' click={this.add} />
+					</div>
+					<div className='table'>
 						<Row className='row head' user={h}  btn={''}/>
 						<Table items={this.props.data} edit={this.edit}/>
 					</div>
@@ -174,3 +177,5 @@ module.exports = React.createClass({
 		return this[this.state.form]();
 	}
 });
+
+

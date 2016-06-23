@@ -8,13 +8,14 @@ module.exports = React.createClass({
         return { classErr: '' };
     },
 
-    handleChange: function(value) {
+    handleChange(value) {
         this.props.validator.set(value);
     },
 
     getDefaultProps() {
         return {
             enable: true,
+            type: 'def',
             validator: {
                     set() {},
                     subscribe() {}
@@ -49,13 +50,24 @@ module.exports = React.createClass({
                 propsInput.onFocus = this.handlFocus;
             propsInput.ref = (c) => this._input = c;
 
-            return (
-                <div className={'input-box-text ' + this.props.className} >
-                    <label className='input-label'>{this.props.label}</label>
-                    <InputText className={this.state.classErr} text={this.props.text} onChange={this.handleChange} props={propsInput} enable={this.props.enable}/>
-                    <p className='last_editor'>{this.props.editor}</p>
-                    {this.messageError}
-                </div>
-        )
+            if(this.props.type === 'def')
+                return (
+                    <div className={'input-box-text ' + this.props.className} >
+                        <label className='input-label'>{this.props.label}</label>
+                        <InputText className={this.state.classErr} text={this.props.text} onChange={this.handleChange} props={propsInput} enable={this.props.enable}/>
+                        <p className='last_editor'>{this.props.editor}</p>
+                        {this.messageError}
+                    </div>
+                    )
+            else
+                return (
+                    <div className={'input-box-text ' + this.props.className} >
+                        <label className='input-label'>{this.props.label}</label>
+                        <div className='indent'>
+                            <InputText className={this.state.classErr} text={this.props.text} onChange={this.handleChange} props={propsInput} enable={this.props.enable}/>
+                            {this.messageError}
+                        </div>
+                    </div>
+                    )
     }
 });

@@ -1,10 +1,8 @@
 import React from 'react';
-//import Calendar from 'react-input-calendar';
 import DatePicker from 'react-datepicker';
 import FieldText from './../fieldText/fieldText.js';
 import moment from 'moment';
 import './date.css';
-import './../../node_modules/react-input-calendar/style/index.css'
 
 import 'react-datepicker/dist/react-datepicker.css'
 
