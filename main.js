@@ -11,10 +11,8 @@ import pubsub from './src/pubsub.js';
 import requests from './src/requests.js';
 
 
-
-
-
 function SubscribePane(url) {
+	const SECOND = 1000;
 
 	function subscribe() {
 		var xhr = new XMLHttpRequest();
@@ -25,13 +23,12 @@ function SubscribePane(url) {
 				subscribe();
 				return;
 			}
-			if (this.status != 404) { // 404 может означать, что сервер перезагружается
-				console.log(this.statusText); // показать ошибку
-			}
-			//setTimeout(subscribe, 1000); // попробовать ещё раз через 1 сек
+/*			if (this.status != 404) {
+				console.log(this.statusText);
+			}*/
 		}
 		xhr.open("GET", url, true);
-		xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+		setTimeout(() => { xhr.abort(); subscribe(); }, 10*SECOND);
 		xhr.send();
 	}
 

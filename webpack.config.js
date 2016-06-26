@@ -6,19 +6,11 @@ const path = require('path');
 
 
 module.exports = {
-    //entry: __dirname + "/main.js",
-    entry: {
-        bundle: __dirname + "/main.js",
-        test: __dirname + "/testcontrol.js"
-    },
-    /*output: {
+    entry: __dirname + "/main.js",
+    output: {
         path: __dirname + "/build",
         filename: "bundle.js",
         library: "index"
-    },*/
-    output: {
-        path: path.join(__dirname, "build"),
-        filename: "[name].js"
     },
     resolve: {
         modulesDirectories: ['node_modules']

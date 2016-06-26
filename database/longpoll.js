@@ -3,11 +3,10 @@ var subscribers = new Map();
 function onSubscribe(req, res) {
 	var id = Math.random();
 
-	res.setHeader('Content-Type', 'text/plain;charset=utf-8');
 	res.setHeader("Cache-Control", "no-cache, must-revalidate");
+	res.setHeader("Transfer-Encoding", "chunked");
 
 	subscribers.set(id,res);
-
 	req.on('close', function() {
 		subscribers.delete(id);
 	});
@@ -15,7 +14,7 @@ function onSubscribe(req, res) {
 
 function publish(data) {
 	subscribers.forEach(x => {
-    	x.end('');	
+    	x.end(data);	
 	});
   	subscribers.clear();
 }
