@@ -13,7 +13,8 @@ var connection = {
         port: 5432,
         database: 'degu98g3me9l74',
         user: 'iqujckjxjswxii',
-        password: '_DSzPBjQ3VAVk_gZTGP7lgogir'
+        password: '_DSzPBjQ3VAVk_gZTGP7lgogir',
+        ssl: true
     };
 
 

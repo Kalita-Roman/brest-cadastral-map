@@ -84,8 +84,8 @@ let loadLayer = function(layer) {
 		.catch(x => console.log(x));
 }
 
-let style_1 = new SetterStyle(0.7, '#afa', '#040');
-let style_2 = new SetterStyle(0.7, '#aaf', '#004');
+let style_1 = new SetterStyle(0.7, '#f44', '#040');
+let style_2 = new SetterStyle(0.7, '#55f', '#004');
 
 const ControllerLayers = {
 	currentLayer: null,
@@ -95,7 +95,7 @@ const ControllerLayers = {
 			name:'Текущие объекты', 
 			nameFormInput: 'Текущий объект', 
 			nameTable: 'apz', 
-			color: '#afa', 
+			color: '#faa', 
 			setterStyle: style_1,
 			form: 'getForm_apz',
 			tables: [ 'kind_building' ],
