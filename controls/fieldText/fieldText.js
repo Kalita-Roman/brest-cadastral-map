@@ -52,7 +52,7 @@ module.exports = React.createClass({
 
             if(this.props.type === 'def')
                 return (
-                    <div className={'input-box-text ' + this.props.className} >
+                    <div className={'field-text-label input-box-text ' + this.props.className} >
                         <label className='input-label'>{this.props.label}</label>
                         <InputText className={this.state.classErr} text={this.props.text} onChange={this.handleChange} props={propsInput} enable={this.props.enable}/>
                         <p className='last_editor'>{this.props.editor}</p>
@@ -61,7 +61,7 @@ module.exports = React.createClass({
                     )
             else
                 return (
-                    <div className={'input-box-text ' + this.props.className} >
+                    <div className={'field-text-label input-box-text ' + this.props.className} >
                         <label className='input-label'>{this.props.label}</label>
                         <div className='indent'>
                             <InputText className={this.state.classErr} text={this.props.text} onChange={this.handleChange} props={propsInput} enable={this.props.enable}/>

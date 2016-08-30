@@ -8,6 +8,7 @@ var connection = {
     	password: 'root'
 	};
 */
+
 var connection = {
         host: 'ec2-54-243-204-195.compute-1.amazonaws.com',
         port: 5432,

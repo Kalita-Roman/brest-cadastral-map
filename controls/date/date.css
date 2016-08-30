@@ -20,3 +20,39 @@
 	vertical-align: middle;
 	display: inline-block;
 }
+
+
+
+.date-field {
+	display: flex;
+	height: auto;
+}
+
+
+.date-field.all-width {
+	float: left;
+    width: 100%;
+	align-items: center;
+}
+
+.date-field.all-width > p {
+	text-align: left;
+}
+
+.date-field.all-width > *:first-child {
+	width: 200px;
+}
+
+.date-field.all-width > *:not(:last-child) {
+	margin-right: 10px; 
+}
+
+
+.date-field.range{
+	flex-direction: column; 
+}
+
+.date-field.range > *{
+	width: 90%;
+	text-align: center;
+}

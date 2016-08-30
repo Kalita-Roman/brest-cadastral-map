@@ -72,8 +72,6 @@ app.post('/user',
         res.send(req.user);
 });
 
-
-
 if (process.env.NODE_ENV !== 'production') {
     const webpack = require('webpack')
     const webpackDevMiddleware = require('webpack-dev-middleware')
@@ -87,8 +85,6 @@ if (process.env.NODE_ENV !== 'production') {
         publicPath: config.output.publicPath
     }))
 }
-
-
 
 var portListening = process.env.PORT || 8080;
 app.listen(portListening, function () {

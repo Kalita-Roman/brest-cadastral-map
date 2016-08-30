@@ -67,8 +67,7 @@ module.exports = React.createClass({
 	},
 
 	getCommonProps(nameField) {
-		let props = {};
-		props.enable = this.enable;
+		let props = { enable: this.enable };
 		if(this.enable)
 			props.editor = this.getEditor(nameField);
 		return props;
@@ -143,38 +142,65 @@ module.exports = React.createClass({
 
 	createDate(label, nameField) {
 		return (
-				<DateFieldLabel 
-					label={label}
-					data={new WrapperData(this.record, this.props.data.record, nameField, null)} 
-					{...this.getCommonProps(nameField)}
-				/>
-				);
+			<DateFieldLabel 
+				label={label}
+				data={new WrapperData(this.record, this.props.data.record, nameField, false)} 
+				{...this.getCommonProps(nameField)}
+			/>
+			);
+	},
+
+	createDateClass(className, label, nameField) {
+		return (
+			<DateFieldLabel 
+				className={className}
+				label={label}
+				data={new WrapperData(this.record, this.props.data.record, nameField, false)} 
+				{...this.getCommonProps(nameField)}
+			/>
+			);
 	},
 
 	createDateRange(label, partName) {
 		return (<div className='range_dates'>
 			<p className='label'>{label}</p>
 			<div className='dates'>
-				{this.createDate('Начало', 'date_start_'+partName)}
-				{this.createDate('Окончание', 'date_end_'+partName)}
+				{this.createDateClass('range', 'Начало', 'date_start_'+partName)}
+				{this.createDateClass('range', 'Окончание', 'date_end_'+partName)}
 			</div>
+		</div>);
+	},
+
+	getForm_geodetic_survey() {
+		return (<div className='content-input'>
+			{this.createField('fieldtext-width', 'Наименование объекта', 'name', ['focus'])}
+			{this.createField('fieldtext-width', 'Местоположение участка работ', 'adress')}
+			{this.createField('one-line', 'Площадь участка, Га', 'area', ['numeric'])}
+			{this.createField('margin-bottom fieldtext-width', 'Исполнитель', 'performer')}
+			{this.createField('margin-bottom fieldtext-width', 'Заказчик', 'customer')}
+			{this.createDateClass('margin-bottom all-width', 'Время производства работ', 'date_work')}
+			{this.createDateClass('margin-bottom all-width', 'Дата возврата', 'date_return')}
+			{this.createField('margin-bottom fieldtext-width', 'ФИО исполнителя за качество работы', 'responsible')}
 		</div>);
 	},
 
 	getForm_apz() {
 		return (<div className='content-input'>
-					{this.createField('fieldtext-width', 'Наименование объекта', 'name', ['focus'])}
-					{this.createField('fieldtext-width', 'Адрес объекта', 'adress')}
-					{this.createField('fieldtext-width', 'Заказчик', 'customer')}
-					{this.createComboBox('Вид строительства', 'kind_building')}
-					{this.createFieldSolution_s('Регистрация в реестре ГГК', 'registry')}
-					{this.createFieldSolution_s('Архитектурно-планировочное задание', 'task')}
-					{this.createFieldSolution_s('Согласование гл. архитектора города', 'architect')}
-					{this.createFieldSolution_s('Экспертиза проекта', 'expertise')}
-					{this.createFieldSolution_s('Решение Госстройнадзора', 'gosstroynadzor')}
-					{this.createDateRange('Сроки строительства проектные', 'proj')}
-					{this.createDateRange('Сроки строительства фактические', 'fact')}
-				</div>);
+			{this.createField('fieldtext-width', 'Наименование объекта', 'name', ['focus'])}
+			{this.createField('fieldtext-width', 'Адрес объекта', 'adress')}
+			{this.createField('fieldtext-width', 'Заказчик', 'customer')}
+			{this.createComboBox('Вид строительства', 'kind_building')}
+
+			{this.createFieldSolution_s('Регистрация в реестре ГГК', 'registry')}
+			{this.createFieldSolution_s('Регистрация в реестре ГГК', 'registry')}
+			{this.createFieldSolution_s('Архитектурно-планировочное задание', 'task')}
+			{this.createFieldSolution_s('Согласование гл. архитектора города', 'architect')}
+			{this.createFieldSolution_s('Экспертиза проекта', 'expertise')}
+			{this.createFieldSolution_s('Решение Госстройнадзора', 'gosstroynadzor')}
+
+			{this.createDateRange('Сроки строительства проектные', 'proj')}
+			{this.createDateRange('Сроки строительства фактические', 'fact')}
+		</div>);
 	},
 
 	getNameEditor(editor) {
@@ -192,7 +218,7 @@ module.exports = React.createClass({
 		return (<div className='content-input'>
 					{this.createField('fieldtext-width', 'Наименование объекта', 'name', ['focus'])}
 					{this.createField('fieldtext-width', 'Адрес объекта', 'adress')}
-					{this.createField('fieldtext-line', 'Площадь участка, Га', 'area', ['numeric'])}
+					{this.createField('one-line', 'Площадь участка, Га', 'area', ['numeric'])}
 					{this.createField('fieldtext-width', 'Победитель аукциона', 'winnerauction')}
 					{this.createFieldSolution_gik('Решение ГИК на разработку градопаспорта','solgik_develpass')}
 					{this.createFieldSolution_gik('Решение ГИК об утверждении градопаспорта','solgik_statepass')}

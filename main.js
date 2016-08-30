@@ -9,6 +9,7 @@ import getRole from './auth/roles.js';
 
 import pubsub from './src/pubsub.js';
 import requests from './src/requests.js';
+import layers from './src/layers.js';
 
 
 function SubscribePane(url) {
@@ -38,37 +39,6 @@ function SubscribePane(url) {
 
 SubscribePane('/publish');
 
-
-
-
-let SetterStyle = function(opacity, _color, _colorLabel) {
-	let _acceptor;
-
-	this.color = function() {
-		return _color;
-	}()
-
-	this.colorLabel = function() {
-		return _colorLabel || '#000';
-	}()
-
-	// TODO: Надо разобраться. Почему? Как?
-	this.currentOpacity = opacity;/* = function() {
-		return _opacity;
-	}();*/
-
-	this.setAcceptor = function(acceptor) {
-		acceptor(opacity);
-		this._acceptor = acceptor;
-	};
-
-	this.setOpacity = function(value) {
-		//opacity = value;
-		this.currentOpacity = value;
-		this._acceptor(value);
-	};
-}
-
 let role;
 
 let loadLayer = function(layer) {
@@ -84,35 +54,9 @@ let loadLayer = function(layer) {
 		.catch(x => console.log(x));
 }
 
-let style_1 = new SetterStyle(0.7, '#f44', '#040');
-let style_2 = new SetterStyle(0.7, '#55f', '#004');
-
 const ControllerLayers = {
 	currentLayer: null,
-
-	layers:  [
-		{ 
-			name:'Текущие объекты', 
-			nameFormInput: 'Текущий объект', 
-			nameTable: 'apz', 
-			color: '#faa', 
-			setterStyle: style_1,
-			form: 'getForm_apz',
-			tables: [ 'kind_building' ],
-			current: false
-		},
-		{ 
-			name:'Градопаспорта', 
-			nameFormInput: 'Градопаспорт', 
-			nameTable: 'citypassport', 
-			color: '#aaf', 
-			setterStyle: style_2,
-			form: 'getForm_citypassport',
-			tables: [ ],
-			current: true
-		}
-	],
-
+	layers,
 	setCheck(key) {
 		this.currentLayer = this.layers[key];
 		CityMap.setCurrentLayer(this.currentLayer.nameTable, x => loadLayer(this.currentLayer, x));
@@ -228,17 +172,17 @@ let insertToMap = function(e) {
 			return ModalForm.showForm(role, data, 'fm_input' )
 		})
 		.then(x => { 
+			console.log('create');
 			res = x.data;
+			res.geom = inputedShape.toGeoJSON(),
+			res.editor = role.user.id;
 			let body = {
 				action: 'insert',
 				body: {
 					layer: ControllerLayers.currentLayer.nameTable,
-					geom: inputedShape.toGeoJSON(),
-					editor: role.user.id,
 					fields: res,
 				}
 			};
-			console.log(body);
 			return requests.request('POST', '/db', body);
 		})
 		.then(y => {

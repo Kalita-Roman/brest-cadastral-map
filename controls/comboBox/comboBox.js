@@ -37,7 +37,6 @@ module.exports = React.createClass({
 	handlChange(e) {
 		this.setState( { value: e.target.value } );
 		this.props.onChange(e);
-		console.log(e.target.value);
 		this.props.validator.set(e.target.value);
 	},
 

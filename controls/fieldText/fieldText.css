@@ -52,5 +52,17 @@
 	margin-right: 5px;	
 }
 
+.field-text-label:not(.fieldtext-width) {
+	display: flex;
+	width: 100%;
+	float: left;
+}
 
+.field-text-label.one-line {
+	align-items: center;
+}
 
+.field-text-label.one-line > label.input-label {
+	text-align: left;
+	margin-right: 10px;
+}

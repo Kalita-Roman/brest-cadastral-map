@@ -1,10 +1,6 @@
 import React from 'react';
-import DatePicker from 'react-datepicker';
 import FieldText from './../fieldText/fieldText.js';
-import moment from 'moment';
 import './date.css';
-
-import 'react-datepicker/dist/react-datepicker.css'
 
 module.exports.DateField = React.createClass({
 	getInitialState: function() {
@@ -13,45 +9,38 @@ module.exports.DateField = React.createClass({
 	    };
   	},
 
-  	getDefaultProps() {
+  	getDefaultProps() { // TODO: Вероятно можно убрать.
   		return {
             show: true
         }
   	},
  
-	handleChange: function(date) {
-  		var date = new Date(date);
+	handleChange(date) {
+  		var date = date.target.value ? new Date(date.target.value) : null;
   		if(this.props.data) 
   			this.props.data.set(date);
-
 		this.setState({
 			startDate: date
 		});
 	},
- 
+
 	render: function() {
-		let props = {};
-
 		let date = this.props.data.get();
-		if(date)
-			props.selected = moment(date);
-
-		return <DatePicker
-			dateFormat="DD/MM/YYYY"
-			placeholderText='Дата'
-		    disabled={!this.props.enable}
-		    onChange={this.handleChange} 
-		    locale='ru-ru'
-		    {...props}
-		/>;
-	}
+		let pr = {
+			value: date ? new Date(date).toISOString().slice(0, 10) : ''
+		};
+		if(!this.props.enable)
+			pr.disabled = 'disabled';
+		return (<input type="date" name="calendar" className='date_field_input-date' onChange={this.handleChange} {...pr}/>)
+	},
 });
+
 
 module.exports.DateFieldLabel = React.createClass({
 	render: function() {
 		return (
-			<div className=''>
-				<p className='label'>{this.props.label}</p>
+			<div className={'date-field ' + this.props.className}>
+				<p className='date-field_label'>{this.props.label}</p>
 				<module.exports.DateField data={this.props.data} enable={this.props.enable} />
 				<p className='last_editor'>{this.props.editor}</p>
 			</div>

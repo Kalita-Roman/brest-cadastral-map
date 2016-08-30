@@ -60,9 +60,9 @@ let createDate = function(enable) {
 	return (<DateField data={this.createWrapper(this.props.nameField + this.props.type.date, null)} enable={enable} />);
 };
 
-let getType_1 = function(enable, clWrapper) {
+let getType_1 = function(enable, className) {
 	return (
-			<div className={clWrapper}>
+			<div className={className + ' b'}>
 				<div>
 					<InputCheck checked={this.state.checked} onChange={this.handlOnChange} enable={this.props.enable} />
 					<p className='input-label'>{this.props.label}</p>
@@ -80,9 +80,9 @@ let getType_1 = function(enable, clWrapper) {
 			)
 };
 
-let getType_2 = function(enable, clWrapper) {
+let getType_2 = function(enable, className) {
 	return (
-			<div className={clWrapper}>
+			<div className={'date-number ' + className}>
 				<div>
 					<InputCheck checked={this.state.checked} onChange={this.handlOnChange} enable={this.props.enable} />
 					<p className='input-label'>{this.props.label}</p>
@@ -130,7 +130,7 @@ let InputCheck = React.createClass({
 							onChange={this.handlerСheckbox} 
 							disabled={this.props.enable ? null :  "disabled"}
 						/>
-						<label for={id}>{this.props.label}</label>
+						<label>{this.props.label}</label>
 				</div>
 			);
 	}

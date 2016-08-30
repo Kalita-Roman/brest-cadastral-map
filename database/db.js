@@ -1,13 +1,13 @@
 'use strict'
 
 var db = require('./connectionPostgreSQL.js');
+var makerQueries = require('./makerQueries');
 
 require("./polyfill.js");
 
-var log = function(x,y) {
+var log = function() {
     console.log();
-    console.log(x);
-    console.log(y);
+    console.log(Array.from(arguments));
     console.log();
 }
 
@@ -99,37 +99,20 @@ var handler = {
 
     insert: function(req, res) {
         var body = req.body.body;
-    	var rec = {}
-        rec.editing_date = new Date();
-        rec.editor = body.editor;
-        rec.layer = body.layer;
-        rec.geom = body.geom;
-
-        var q1 = '';
-        var q2 = '';
-        var last = new LastEditors(body, rec);
-
-        for(var field in  body.fields) {
-            rec[field] = body.fields[field];
-            last.add(field);
-            q1 += (', '+ field);
-            q2 += (', ${' + field + '}');
-        }
-
-        var id;
-
-        return db.one("INSERT INTO ${layer~}(geom, editor, editing_date" + q1 +") VALUES(${geom}, ${editor}, ${editing_date}" + q2 +") returning id", rec)
+        var fields = Object.assign( { editing_date : new Date() } , body.fields);
+        var namesFields = Object.keys(fields);
+        var last = new LastEditors(body, fields);
+        namesFields.forEach(x => last.add(x));
+        var query = makerQueries.createInsert(body.layer, fields);
+        return db.one(query, fields)
             .then(data => {
                 id = data;
                 last.setId(data.id);
                 return last.getSomeRequests();
             })
-            .then(function (data) {
+            .then(data => {
                 res.status(201).send(id);
             });
-            /*.catch(function (error) {
-                res.send(error);
-            });*/
     },
 
     update: function(req, res) {
@@ -158,20 +141,16 @@ var handler = {
         	var editors;
             if(!req.body.body)
                 resolve({});
-            //log(req.body);
             db.one("SELECT * FROM ${layer~} WHERE id=${id}", req.body.body)
                 .then(data => {
-              //      log('__ЗАПИСЬ',data);
                     record = data;
                     return db.any("SELECT * FROM last WHERE (nametable=${layer} AND idrec=${id});", req.body.body);
                 })
                 .then(data => {
-                //    log('__РЕДАДКЦИИ',data);
                     editors = data;
                     return db.any("SELECT * FROM users");
                 })
                 .then(data => {
-                //    log('__РЕДАКТОРЫ',data);
                     return editors.reduce(
                         (prev, cur) => { 
                             var editor = data.find(x => x.id === cur.id_editor);
@@ -180,11 +159,9 @@ var handler = {
                     );
                 })
                 .then(data => {
-                //    log('__ПОСЛЕДНЕЕ',data);
                     record.editors = data;
                     resolve({ name:'record', value:record });
                 });
-            //log('конец');
         });
 
 	    var ptab = new Promise((resolve, reject) => {
@@ -233,53 +210,38 @@ var handler = {
                 res.status(201).send(data);
                 cb();
             });
-            /*.catch(function (error) {
-                console.log('ERROR\n',error);
-                res.send(error);
-            });*/
     },
 
     showeditors(req, res) {
         var body = req.body.body;
 
         return db.any("SELECT * FROM users WHERE role='editor'")
-            .then(function (data) {
+            .then(data => {
                 res.send(data);
             });
-            /*.catch(function (error) {
-                res.send('error');
-            });*/
     },
 
     editorInsert(req, res) {
-        return db.one("INSERT INTO users(name, post, username, password, role) VALUES(${name}, ${post}, ${username}, ${password}, 'editor') returning id", req.body.user)
-            .then(function (id) {
+        var fields = Object.assign({ role: 'editor' }, req.body.user);
+        var query = makerQueries.createInsert('users', fields);
+        return db.one(query, fields)
+            .then(id => {
                 res.status(201).send(id);
             })
-          /*  .catch(function (error) {
-                res.send(error);
-            }); */
     },
 
     editorDelete(req, res) {
         return db.one("DELETE FROM users WHERE id=${id}", req.body.user)
-            .then(function (data) {
+            .then(data => {
                 res.status(200).send('OK');
             });
-            /*.catch(function (error) {
-                res.send(error);
-            });*/
     },
 
     editorUpdate(req, res) {
-      
         return db.one("UPDATE users SET name=${name}, post=${post}, username=${username}, password=${password} WHERE id=${id}", req.body.user)
-            .then(function (data) {
+            .then(data => {
                 res.status(200).send('OK');
             });
-            /*.catch(function (error) {
-                res.send(error);
-            });*/
     }
 }
 
@@ -303,7 +265,6 @@ module.exports.database = function(req, res, cb) {
         .then(() => {
             if(longpollFuncs.includes(req.body.action))
                 cb();
-
         })
         .catch(error => {
             res.send(error);
